@@ -9,13 +9,18 @@ version="2.4">
 <servlet>
         <servlet-name>FrontController</servlet-name>
         <servlet-class>main.java.FrontControllerServlet</servlet-class>
+        
+        <init-param>
+            <param-name>PackCon</param-name>
+            <param-value></param-value>
+    </init-param>
+
     </servlet>
 
     <servlet-mapping>
         <servlet-name>FrontController</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
-
 <!-- <servlet>
     <servlet-name>banque</servlet-name>
     <servlet-class>main.java.servlet.ChequeServlet</servlet-class>
