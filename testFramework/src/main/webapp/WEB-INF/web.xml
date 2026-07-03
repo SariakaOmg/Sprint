@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+version="2.4">
+<display-name>Application WEB affichant HelloWorld</display-name>
+
+<servlet>
+        <servlet-name>FrontController</servlet-name>
+        <servlet-class>main.java.FrontControllerServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>FrontController</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+<!-- <servlet>
+    <servlet-name>banque</servlet-name>
+    <servlet-class>main.java.servlet.ChequeServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+<servlet-name>banque</servlet-name>
+<url-pattern>/cheque/list</url-pattern>
+</servlet-mapping> -->
+
+</web-app>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
