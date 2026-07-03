@@ -4,6 +4,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 import java.lang.reflect.Method;
 import mg.itu.*;
@@ -53,10 +55,30 @@ public class Scannerrrs {
                     
                     URLMapping um = method[i].getAnnotation(mg.itu.URLMapping.class);
                     listePresentMapping1.add(um.value());//URL
+                    listePresentMapping1.add(um.methode());
                 }
                 listePresentMapping.add(listePresentMapping1);
             }
         }
         return listePresentMapping;
+    }
+    public static Map<URLetMethodeHttps, ClasseMethodeMap> MettreDansMap(ArrayList<ArrayList<String>> listePresentMapping)throws Exception{
+        Map<URLetMethodeHttps, ClasseMethodeMap> listeUrMap3 = new HashMap<>();
+
+        for (int index = 0; index < listePresentMapping.size(); index++) {
+               ClasseMethodeMap cm = new ClasseMethodeMap();
+               cm.setKilasy(Class.forName(listePresentMapping.get(index).get(0)));
+               cm.setNomMethode(listePresentMapping.get(index).get(1));
+               URLetMethodeHttps urLetMethodeHttps = new URLetMethodeHttps();
+               urLetMethodeHttps.setMethode(listePresentMapping.get(index).get(3));
+               urLetMethodeHttps.setUrl(listePresentMapping.get(index).get(2));
+               if(listeUrMap3.get(urLetMethodeHttps) != null){
+                throw new Exception("Deux Methodes ayant le meme URL ");
+               }else{
+               listeUrMap3.put(urLetMethodeHttps, cm);
+               }
+            }
+
+        return listeUrMap3;
     }
 }

@@ -1,9 +1,10 @@
 package main.java;
 import jakarta.servlet.ServletException;
-
+ 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.stream.Stream;
 import mg.itu.URLMapping;
@@ -11,11 +12,11 @@ import utils.Scannerrrs;
 import java.util.HashMap;
 import java.util.Map;
 import utils.ClasseMethodeMap;
-
+import utils.URLetMethodeHttps;
 public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
-    private Map<String, ClasseMethodeMap> listeUrMap2 = new HashMap<>();
+    private Map<URLetMethodeHttps, ClasseMethodeMap> listeUrMap3 = new HashMap<>();
     private String Errer;
-
+ 
     public void init() throws ServletException {
         String chemine = "/opt/tomcat/webapps/testFramework/WEB-INF/classes";
         String packageContr = "";
@@ -24,68 +25,168 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
         }
         try {
             ArrayList<ArrayList<String>> scanResultMap = Scannerrrs.ScannerURLMapping(chemine, packageContr);
-            for (int index = 0; index < scanResultMap.size(); index++) {
-               ClasseMethodeMap cm = new ClasseMethodeMap();
-               cm.setKilasy(Class.forName(scanResultMap.get(index).get(0)));
-               cm.setNomMethode(scanResultMap.get(index).get(1));
-               if(this.listeUrMap2.get(scanResultMap.get(index).get(2)) != null){
-                throw new Exception("Deux Methode ayant le meme URL ");
-               }else{
-               this.listeUrMap2.put(scanResultMap.get(index).get(2), cm);
-               }
-            }
+            this.listeUrMap3 = Scannerrrs.MettreDansMap(scanResultMap);
             this.Errer = "";
         } catch (Exception e) {
             this.Errer = e.getMessage();
         }
-        
     }
-    protected void processRequest(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws jakarta.servlet.ServletException, java.io.IOException {
-    response.setContentType("text/html;charset=UTF-8");
-     
-     String url = request.getRequestURI();
+ 
+    //
+    private Object convertirArgument(String[] valeurs, Class<?> typeAttendu) {
+    if (valeurs == null || valeurs.length == 0) {
+        if (typeAttendu.isPrimitive()) {
+            if (typeAttendu == boolean.class) return false;
+            return 0; 
+        }
+        return null; 
+    }
+ 
+    String premiereValeur = valeurs[0]; 
+ 
+    if (typeAttendu == String.class) {
+        return premiereValeur;
+    } else if (typeAttendu == int.class || typeAttendu == Integer.class) {
+        return Integer.parseInt(premiereValeur);
+    } else if (typeAttendu == double.class || typeAttendu == Double.class) {
+        return Double.parseDouble(premiereValeur);
+    } else if (typeAttendu == boolean.class || typeAttendu == Boolean.class) {
+        return Boolean.parseBoolean(premiereValeur);
+    }
+    
+    return premiereValeur; 
+    }
+    //maka donnee by url
+    protected void TakeDonneByUrl(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, Map<URLetMethodeHttps, ClasseMethodeMap> listeFiltree){
+        listeFiltree.forEach((url, classeMethode) -> {
+            Map<String, String[]> parameterMap = request.getParameterMap();
+            Map<String, Class<?>> parametermethode = classeMethode.getNomEtTyPeArg();
+            
+            Class<?> kl = classeMethode.getKilasy();
+            Method[] methodkl = kl.getMethods();
+            Method m = null;
 
-     java.io.PrintWriter out = response.getWriter();
-     
-     out.println("<!DOCTYPE html>");
-     out.println("<html>");
-     out.println("<head>");
-     out.println("    <title>Mon Frameworks</title>");
-     out.println("</head>");
-     out.println("<body>");
-     
-     out.println("    <h1>Bienvenue dans mon Frameworks !</h1>");
-     out.println("    <p>URL détectée par le FrontController : <strong>" + url + "</strong></p>");
-     String path = request.getContextPath();
-     String urlsansProjet = url.substring(path.length());
-     Boolean urltrouve = false;
-     if(!this.Errer.equals("")){
-        out.println("<p> Erreur : "+this.Errer+"</p>");
-        }else{
-        if (this.listeUrMap2.get(urlsansProjet) != null) {
-        out.println("<p> url de la fonction : "+urlsansProjet+"</p>");
-        out.println(" <p> Classe ou elle se trouve : "+this.listeUrMap2.get(urlsansProjet).getKilasy().getName()+" </p> ");
-        out.println(" <p> Methode qui l utilise : "+this.listeUrMap2.get(urlsansProjet).getNomMethode()+" </p> ");
-        urltrouve = true;
-        }    
-        if(!urltrouve){
-        out.println("<p>Inconnu les seules connus : </p>");
-        
-        this.listeUrMap2.forEach((NomUrl , ClasseMethode)->{
-            out.println("<p>Url correspondant : "+NomUrl+"</p>");
-            out.println("<p> Classe ou elle se trouve :"+ClasseMethode.getKilasy().getName()+" </p>");
-            out.println("<p> Methode qui l'utilise : "+ClasseMethode.getNomMethode()+" </p>");
+            for (Method method : methodkl) {
+                if (method.getName().equals(classeMethode.getNomMethode())) {
+                    m = method;
+                }
+            }
+            ArrayList<Object> temp = new ArrayList<>();
+            parameterMap.forEach((nom, value)->{
+                Class<?> klas = parametermethode.get(nom);
+                if (klas != null){
+                Object arg = convertirArgument(value, klas);
+                temp.add(arg);
+                }
+            });
+            Object[] argumentsPourAppel = new Object[temp.size()];
+            for (int index = 0; index < temp.size(); index++) {
+                argumentsPourAppel[index] = temp.get(index);
+            }
+                Object result = null;
+                try {
+                    if(classeMethode.isStaticite()){
+                        result = m.invoke(null, argumentsPourAppel);
+                    } else {
+                        Object instance = kl.getDeclaredConstructor().newInstance();
+                        result = m.invoke(instance, argumentsPourAppel);
+                    }
+                
+                    request.setAttribute("methodeNom", m.getName());
+                    request.setAttribute("classeNom", kl.getSimpleName());
+                
+                    if (m.getReturnType() == void.class) {
+                        request.setAttribute("statusExecution", "Exécutée avec succès (void, aucun retour)");
+                    } else {
+                        request.setAttribute("statusExecution", "Retour : " + (result != null ? result.toString() : "null"));
+                    }
+                
+                } catch (Exception e) {
+                    request.setAttribute("erreurExecution", e.getMessage());
+                }
         });
     }
-    }
-     out.println("</body>");
-     out.println("</html>");
-    }
+    //filtrer by url
+    protected Map<URLetMethodeHttps, ClasseMethodeMap> FiltrerByUrl(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response)throws java.io.IOException{
+        String url = request.getRequestURI();
+            
+        String path = request.getContextPath();
+    
+        String urlsansProjet = url.substring(path.length());
+        Map<URLetMethodeHttps, ClasseMethodeMap> liste = new HashMap<>();
 
+        if(!this.Errer.equals("")){
+        }else{
+            URLetMethodeHttps urLetMethodeHttps = new URLetMethodeHttps();
+        if (request.getMethod().equals("GET")){
+            urLetMethodeHttps.setUrl(urlsansProjet);
+            urLetMethodeHttps.setMethode("GET");
+        }else if (request.getMethod().equals("POST")){
+            // URLetMethodeHttps urLetMethodeHttps2 = new URLetMethodeHttps();
+            urLetMethodeHttps.setUrl(urlsansProjet);
+            urLetMethodeHttps.setMethode("POST");
+        }
+
+        if (this.listeUrMap3.get(urLetMethodeHttps) != null) {
+            liste.put(urLetMethodeHttps, this.listeUrMap3.get(urLetMethodeHttps));
+        }if (this.listeUrMap3.get(urLetMethodeHttps) != null) {
+            liste.put(urLetMethodeHttps,this.listeUrMap3.get(urLetMethodeHttps));
+        }    
+ 
+        }
+        return liste;
+    }
+    
+    protected void processRequest(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws jakarta.servlet.ServletException, java.io.IOException {
+    response.setContentType("text/html;charset=UTF-8");
+        Map<URLetMethodeHttps, ClasseMethodeMap> listeFiltree = this.FiltrerByUrl(request, response);
+        if (!listeFiltree.isEmpty()) {
+            this.TakeDonneByUrl(request, response, listeFiltree);
+        }
+        this.Output(request, response);
+    }
+ 
+    // output
+    protected void Output(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+        String url = request.getRequestURI();
+        java.io.PrintWriter out = response.getWriter();
+        
+        // Récupération des informations de la méthode exécutée
+        String classeNom = (String) request.getAttribute("classeNom");
+        String methodeNom = (String) request.getAttribute("methodeNom");
+        String statusExecution = (String) request.getAttribute("statusExecution");
+        String erreurExecution = (String) request.getAttribute("erreurExecution");
+ 
+        out.println("<!DOCTYPE html>");
+        out.println("<html>");
+        out.println("<head><title>Mon Framework</title></head>");
+        out.println("<body>");
+        out.println("    <h1>Bienvenue dans mon Framework !</h1>");
+        out.println("    <p>URL détectée : <strong>" + url + "</strong></p>");
+        
+        if(!this.Errer.equals("")){
+            out.println("<p style='color:red;'>Erreur Initialisation : " + this.Errer + "</p>");
+        } else if (erreurExecution != null) {
+            out.println("<p style='color:red;'>Erreur lors de l'exécution : " + erreurExecution + "</p>");
+        } else if (methodeNom != null) {
+            out.println("<h3>Contrôleur invoqué :</h3>");
+            out.println("<ul>");
+            out.println("    <li><strong>Classe :</strong> " + classeNom + "</li>");
+            out.println("    <li><strong>Méthode :</strong> " + methodeNom + "()</li>");
+            out.println("    <li><strong>Résultat :</strong> " + statusExecution + "</li>");
+            out.println("</ul>");
+        } else {
+            out.println("<p>Aucune méthode correspondante trouvée pour cette URL.</p>");
+        }
+ 
+        out.println("</body>");
+        out.println("</html>");
+    }
+ 
     protected void doPost(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws jakarta.servlet.ServletException, java.io.IOException {
         processRequest(request, response);
     }
-
+ 
     protected void doGet(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws jakarta.servlet.ServletException, java.io.IOException {
         processRequest(request, response);
     }
