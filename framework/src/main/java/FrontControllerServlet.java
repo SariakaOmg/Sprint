@@ -6,46 +6,39 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.nio.file.Files;
 import java.util.stream.Stream;
-import mg.itu.*;
+import mg.itu.URLMapping;
 import utils.Scannerrrs;
+import java.util.HashMap;
+import java.util.Map;
+import utils.ClasseMethodeMap;
 
 public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
-    private ArrayList<String> Controller = new ArrayList<>();
+    private Map<String, ClasseMethodeMap> listeUrMap2 = new HashMap<>();
+    private String Errer;
 
     public void init() throws ServletException {
         String chemine = "/opt/tomcat/webapps/testFramework/WEB-INF/classes";
         String packageContr = "";
-        //Path cheminFichier = Paths.get(chemine);
-        //Path cheminFichier = Paths.get("/opt/tomcat/webapps/testFramework/WEB-INF/classes");
-        //try {
-        //    Stream<Path> chemins = Files.walk(cheminFichier);
-        //    chemins.forEach(chemin -> {
-        //        if (!Files.isDirectory(chemin)){
-        //            String cheminString = chemin.toString().replace(chemin.getFileSystem().getSeparator(), ".");
-        //            String cheminVrais = cheminString.substring(chemine.length() + 1);
-        //            String CheminVraissansPointClasse = cheminVrais.substring(0, cheminVrais.length()-6);
-        //            Class<?> kilasy = null;
-        //            try {
-        //            kilasy = Class.forName(CheminVraissansPointClasse);
-        //            } catch (Exception e) {
-        //                
-        //            }
-        //            if(kilasy != null && kilasy.isAnnotationPresent(mg.itu.Controller.class)){
-        //                this.Controller.add(kilasy.getName());
-        //                //this.Controller.add(cheminString);
-        //            }
-        //        }
-        //    });
-        //} catch (Exception e) {
-        //    // TODO: handle exception
-        //}
         if (getInitParameter("PackCon") != null) {
             packageContr = getInitParameter("PackCon");
         }
-        ArrayList<String> scanResultContr= Scannerrrs.ScannerController(chemine, packageContr);
-        for (int index = 0; index < scanResultContr.size(); index++) {
-            this.Controller.add(scanResultContr.get(index));
+        try {
+            ArrayList<ArrayList<String>> scanResultMap = Scannerrrs.ScannerURLMapping(chemine, packageContr);
+            for (int index = 0; index < scanResultMap.size(); index++) {
+               ClasseMethodeMap cm = new ClasseMethodeMap();
+               cm.setKilasy(Class.forName(scanResultMap.get(index).get(0)));
+               cm.setNomMethode(scanResultMap.get(index).get(1));
+               if(this.listeUrMap2.get(scanResultMap.get(index).get(2)) != null){
+                throw new Exception("Deux Methode ayant le meme URL ");
+               }else{
+               this.listeUrMap2.put(scanResultMap.get(index).get(2), cm);
+               }
+            }
+            this.Errer = "";
+        } catch (Exception e) {
+            this.Errer = e.getMessage();
         }
+        
     }
     protected void processRequest(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws jakarta.servlet.ServletException, java.io.IOException {
     response.setContentType("text/html;charset=UTF-8");
@@ -63,10 +56,28 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
      
      out.println("    <h1>Bienvenue dans mon Frameworks !</h1>");
      out.println("    <p>URL détectée par le FrontController : <strong>" + url + "</strong></p>");
-     out.println(" <p> Ici tous les controllers de cette test : </p> ");
-     for (int i = 0; i < Controller.size(); i++) {
-        out.println(" <p> controller"+i+" : "+Controller.get(i));
-     }
+     String path = request.getContextPath();
+     String urlsansProjet = url.substring(path.length());
+     Boolean urltrouve = false;
+     if(!this.Errer.equals("")){
+        out.println("<p> Erreur : "+this.Errer+"</p>");
+        }else{
+        if (this.listeUrMap2.get(urlsansProjet) != null) {
+        out.println("<p> url de la fonction : "+urlsansProjet+"</p>");
+        out.println(" <p> Classe ou elle se trouve : "+this.listeUrMap2.get(urlsansProjet).getKilasy().getName()+" </p> ");
+        out.println(" <p> Methode qui l utilise : "+this.listeUrMap2.get(urlsansProjet).getNomMethode()+" </p> ");
+        urltrouve = true;
+        }    
+        if(!urltrouve){
+        out.println("<p>Inconnu les seules connus : </p>");
+        
+        this.listeUrMap2.forEach((NomUrl , ClasseMethode)->{
+            out.println("<p>Url correspondant : "+NomUrl+"</p>");
+            out.println("<p> Classe ou elle se trouve :"+ClasseMethode.getKilasy().getName()+" </p>");
+            out.println("<p> Methode qui l'utilise : "+ClasseMethode.getNomMethode()+" </p>");
+        });
+    }
+    }
      out.println("</body>");
      out.println("</html>");
     }
