@@ -7,20 +7,27 @@ version="2.4">
 <display-name>Application WEB affichant HelloWorld</display-name>
 
 <servlet>
-        <servlet-name>FrontController</servlet-name>
-        <servlet-class>main.java.FrontControllerServlet</servlet-class>
-        
-        <init-param>
-            <param-name>PackCon</param-name>
-            <param-value></param-value>
+    <servlet-name>FrontController</servlet-name>
+    <servlet-class>main.java.FrontControllerServlet</servlet-class>
+    <init-param>
+        <param-name>PackCon</param-name>
+        <param-value></param-value>
     </init-param>
-
-    </servlet>
-
+    <init-param>
+        <param-name>PackView</param-name>
+        <param-value>/WEB-INF/</param-value>
+    </init-param>
+    <init-param>
+        <param-name>ExtensionView</param-name>
+        <param-value>jsp</param-value>
+    </init-param>
+</servlet>
     <servlet-mapping>
         <servlet-name>FrontController</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
+
+   
 <!-- <servlet>
     <servlet-name>banque</servlet-name>
     <servlet-class>main.java.servlet.ChequeServlet</servlet-class>
