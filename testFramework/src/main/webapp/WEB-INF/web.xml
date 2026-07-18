@@ -14,6 +14,10 @@ version="2.4">
             <param-name>PackCon</param-name>
             <param-value></param-value>
     </init-param>
+    <init-param>
+        <param-name>CheminClasses</param-name>
+        <param-value>/WEB-INF/classes</param-value>
+    </init-param>
 
     </servlet>
 
