@@ -1,13 +1,20 @@
 package exemple;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import javax.print.DocFlavor.STRING;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import mg.itu.Controller;
 import mg.itu.URLMapping;
 import utils.*;
+import exemple.model.MonObjet;
+import exemple.service.MonObjetService;
 
 @Controller
 public class ex1 {
@@ -29,5 +36,25 @@ public class ex1 {
         
         return mv;
     }
+
+    @URLMapping(value = "/fafa", methode = "GET")
+public ModelView afficherFafa(HttpServletRequest request, HttpServletResponse response) {
+
+    // 1. Récupérer le contexte Spring (chargé par ContextLoaderListener)
+    WebApplicationContext context = WebApplicationContextUtils
+            .getRequiredWebApplicationContext(request.getServletContext());
+
+    // 2. Extraire le service Spring depuis le contexte
+    MonObjetService monObjetService = context.getBean(MonObjetService.class);
+
+    // 3. Utiliser le service (qui va chercher en base) pour extraire les données
+    ArrayList<MonObjet> listeDonnees = monObjetService.getDonneesPourFafa();
+    ArrayList<Object> listeObjets = new ArrayList<>(listeDonnees); // <-- la conversion
+
+    Map<String, ArrayList<Object>> list = new HashMap<>();
+    list.put("key", listeObjets);
+    ModelView mv = new ModelView("Fafa", list);
+    return mv;
+}
 
 }

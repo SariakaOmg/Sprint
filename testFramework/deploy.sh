@@ -20,7 +20,8 @@ mkdir -p $BUILD_DIR/WEB-INF/classes
 find $SRC_DIR -name "*.java" > sources.txt
 
 # On ajoute essai.jar au classpath en utilisant le séparateur ":"
-javac -cp "$SERVLET_API_JAR:$LIB_DIR/essai.jar" -d $BUILD_DIR/WEB-INF/classes @sources.txt
+javac -cp "$LIB_DIR/*" -d $BUILD_DIR/WEB-INF/classes @sources.txt
+# javac -cp "$SERVLET_API_JAR:$LIB_DIR/essai.jar" -d $BUILD_DIR/WEB-INF/classes @sources.txt
 rm sources.txt
 
 cp $LIB_DIR/* $BUILD_DIR/WEB-INF/lib/

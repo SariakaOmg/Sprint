@@ -13,9 +13,15 @@ import java.util.HashMap;
 import java.util.Map;
 import utils.ClasseMethodeMap;
 import utils.URLetMethodeHttps;
+import utils.Util;
+import utils.ModelView;
+import org.springframework.web.context.WebApplicationContext;
 public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     private Map<URLetMethodeHttps, ClasseMethodeMap> listeUrMap3 = new HashMap<>();
     private String Errer;
+    private WebApplicationContext springContext;
+    private String packView;
+    private String extensionView;
  
     public void init() throws ServletException {
         String chemine = "/opt/tomcat/webapps/testFramework/WEB-INF/classes";
@@ -23,6 +29,8 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
         if (getInitParameter("PackCon") != null) {
             packageContr = getInitParameter("PackCon");
         }
+        this.packView = getInitParameter("PackView") != null ? getInitParameter("PackView") : "/WEB-INF/";
+        this.extensionView = getInitParameter("ExtensionView") != null ? getInitParameter("ExtensionView") : "jsp";
         try {
             ArrayList<ArrayList<String>> scanResultMap = Scannerrrs.ScannerURLMapping(chemine, packageContr);
             this.listeUrMap3 = Scannerrrs.MettreDansMap(scanResultMap);
@@ -30,6 +38,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
         } catch (Exception e) {
             this.Errer = e.getMessage();
         }
+        this.springContext = (WebApplicationContext) getServletContext().getAttribute("springContext");
     }
  
     //
@@ -85,17 +94,28 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
             }
                 Object result = null;
                 try {
-                    if(classeMethode.isStaticite()){
-                        result = m.invoke(null, argumentsPourAppel);
+                    Object instance = classeMethode.isStaticite() ? null : kl.getDeclaredConstructor().newInstance();
+
+                    if (Util.haveParameter(m, WebApplicationContext.class)) {
+                        if (this.springContext == null) {
+                            throw new Exception("Pas de springContext disponible");
+                        }
+                        result = m.invoke(instance, this.springContext);
+                    } else if (Util.haveParameter(m, jakarta.servlet.http.HttpServletRequest.class)
+                            && Util.haveParameter(m, jakarta.servlet.http.HttpServletResponse.class)) {
+                        result = m.invoke(instance, request, response);
                     } else {
-                        Object instance = kl.getDeclaredConstructor().newInstance();
                         result = m.invoke(instance, argumentsPourAppel);
                     }
                 
                     request.setAttribute("methodeNom", m.getName());
                     request.setAttribute("classeNom", kl.getSimpleName());
                 
-                    if (m.getReturnType() == void.class) {
+                    if (result instanceof ModelView) {
+    ModelView mv = (ModelView) result;
+    mv.getContenueView().forEach(request::setAttribute);
+    request.setAttribute("vueForward", mv.getNomView());
+} else if (m.getReturnType() == void.class) {
                         request.setAttribute("statusExecution", "Exécutée avec succès (void, aucun retour)");
                     } else {
                         request.setAttribute("statusExecution", "Retour : " + (result != null ? result.toString() : "null"));
@@ -140,10 +160,20 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     protected void processRequest(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws jakarta.servlet.ServletException, java.io.IOException {
     response.setContentType("text/html;charset=UTF-8");
         Map<URLetMethodeHttps, ClasseMethodeMap> listeFiltree = this.FiltrerByUrl(request, response);
+        if (request.getDispatcherType() == jakarta.servlet.DispatcherType.FORWARD) {
+            request.getServletContext().getNamedDispatcher("jsp").forward(request, response);
+            return;
+        }
         if (!listeFiltree.isEmpty()) {
             this.TakeDonneByUrl(request, response, listeFiltree);
         }
-        this.Output(request, response);
+        String vueForward = (String) request.getAttribute("vueForward");
+        if (vueForward != null) {
+            String chemin = this.packView + vueForward + "." + this.extensionView;
+            request.getRequestDispatcher(chemin).forward(request, response);
+        } else {
+            this.Output(request, response);
+        }
     }
  
     // output
