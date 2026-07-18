@@ -125,7 +125,6 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                 }
         });
     }
-
     //filtrer by url
     protected Map<URLetMethodeHttps, ClasseMethodeMap> FiltrerByUrl(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response)throws java.io.IOException{
         String url = request.getRequestURI();
