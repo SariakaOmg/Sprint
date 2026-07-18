@@ -11,17 +11,26 @@ import mg.itu.URLMapping;
 import utils.Scannerrrs;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
 import utils.ClasseMethodeMap;
 import utils.URLetMethodeHttps;
+import utils.ModelView;
 public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     private Map<URLetMethodeHttps, ClasseMethodeMap> listeUrMap3 = new HashMap<>();
     private String Errer;
+    String prefixe;
+    String suffixe;
  
     public void init() throws ServletException {
         String chemine = "/opt/tomcat/webapps/testFramework/WEB-INF/classes";
         String packageContr = "";
         if (getInitParameter("PackCon") != null) {
             packageContr = getInitParameter("PackCon");
+        }
+        if (getInitParameter("PackView") != null && getInitParameter("ExtensionView") != null){
+            this.prefixe = getInitParameter("PackView");
+            this.suffixe = getInitParameter("ExtensionView");
         }
         try {
             ArrayList<ArrayList<String>> scanResultMap = Scannerrrs.ScannerURLMapping(chemine, packageContr);
@@ -97,15 +106,22 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                 
                     if (m.getReturnType() == void.class) {
                         request.setAttribute("statusExecution", "Exécutée avec succès (void, aucun retour)");
-                    } else {
-                        request.setAttribute("statusExecution", "Retour : " + (result != null ? result.toString() : "null"));
-                    }
-                
+                    } else if(m.getReturnType() != void.class) {
+                        if (m.getReturnType() ==  ModelView.class){
+                            ModelView a = (ModelView) result;
+                            request.setAttribute("ModelView", a);
+                        }else{
+                            request.setAttribute("statusExecution", "Retour : " + (result != null ? result.toString() : "null"));
+                        }
+                    } 
+                    
+        
                 } catch (Exception e) {
                     request.setAttribute("erreurExecution", e.getMessage());
                 }
         });
     }
+
     //filtrer by url
     protected Map<URLetMethodeHttps, ClasseMethodeMap> FiltrerByUrl(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response)throws java.io.IOException{
         String url = request.getRequestURI();
@@ -132,18 +148,43 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
         }if (this.listeUrMap3.get(urLetMethodeHttps) != null) {
             liste.put(urLetMethodeHttps,this.listeUrMap3.get(urLetMethodeHttps));
         }    
- 
         }
         return liste;
     }
+
     
-    protected void processRequest(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws jakarta.servlet.ServletException, java.io.IOException {
-    response.setContentType("text/html;charset=UTF-8");
+    protected void executeFonction(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws jakarta.servlet.ServletException, java.io.IOException{
+        response.setContentType("text/html;charset=UTF-8");
         Map<URLetMethodeHttps, ClasseMethodeMap> listeFiltree = this.FiltrerByUrl(request, response);
         if (!listeFiltree.isEmpty()) {
             this.TakeDonneByUrl(request, response, listeFiltree);
         }
-        this.Output(request, response);
+    }
+
+    protected void processRequest(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws jakarta.servlet.ServletException, java.io.IOException {
+     if (request.getDispatcherType() != jakarta.servlet.DispatcherType.REQUEST) {
+        // Requête interne (forward vers une JSP), interceptée via le mapping "/*".
+        // On la fait exécuter par le vrai moteur JSP de Tomcat au lieu de l'ignorer.
+        request.getServletContext().getNamedDispatcher("jsp").forward(request, response);
+        return;
+    }
+
+        this.executeFonction(request, response);
+        
+        // si c est ModelView
+        if((ModelView) request.getAttribute("ModelView") == null){
+            this.Output(request, response);
+        }else if((ModelView) request.getAttribute("ModelView") != null){
+            ModelView a = (ModelView) request.getAttribute("ModelView");
+            Set<String> cle = a.getContenueView().keySet();
+            String premierElement = cle.stream()
+                             .findFirst()
+                             .orElse(null); // Renvoie null si le Set est vide
+            request.setAttribute(premierElement,a.getContenueView().get(premierElement));
+            request.getRequestDispatcher(prefixe+"/"+a.getNomView()+"."+suffixe).forward(request, response);
+        }
+        
+
     }
  
     // output
