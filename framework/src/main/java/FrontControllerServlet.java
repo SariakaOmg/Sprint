@@ -15,27 +15,30 @@ import java.util.Set;
 
 import utils.ClasseMethodeMap;
 import utils.URLetMethodeHttps;
+import utils.Util;
 import utils.ModelView;
+import org.springframework.web.context.WebApplicationContext;
 public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     private Map<URLetMethodeHttps, ClasseMethodeMap> listeUrMap3 = new HashMap<>();
     private String Errer;
-    String prefixe;
-    String suffixe;
+    private WebApplicationContext springContext;
+    private String packView;
+    private String extensionView;
  
     public void init() throws ServletException {
-         // Étape A : Récupérer la valeur déclarée dans le web.xml ("/WEB-INF/classes/")
+        // Étape A : Récupérer la valeur déclarée dans le web.xml ("/WEB-INF/classes/")
         String parametreChemin = this.getInitParameter("CheminClasses");
 
         // Étape B : Convertir en chemin absolu réel sur le disque
         String chemine = this.getServletContext().getRealPath(parametreChemin);
+        
+        // String chemine = "/opt/tomcat/webapps/testFramework/WEB-INF/classes";
         String packageContr = "";
         if (getInitParameter("PackCon") != null) {
             packageContr = getInitParameter("PackCon");
         }
-        if (getInitParameter("PackView") != null && getInitParameter("ExtensionView") != null){
-            this.prefixe = getInitParameter("PackView");
-            this.suffixe = getInitParameter("ExtensionView");
-        }
+        this.packView = getInitParameter("PackView") != null ? getInitParameter("PackView") : "/WEB-INF/";
+        this.extensionView = getInitParameter("ExtensionView") != null ? getInitParameter("ExtensionView") : "jsp";
         try {
             ArrayList<ArrayList<String>> scanResultMap = Scannerrrs.ScannerURLMapping(chemine, packageContr);
             this.listeUrMap3 = Scannerrrs.MettreDansMap(scanResultMap);
@@ -43,6 +46,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
         } catch (Exception e) {
             this.Errer = e.getMessage();
         }
+        this.springContext = (WebApplicationContext) getServletContext().getAttribute("springContext");
     }
  
     //
@@ -98,17 +102,28 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
             }
                 Object result = null;
                 try {
-                    if(classeMethode.isStaticite()){
-                        result = m.invoke(null, argumentsPourAppel);
+                    Object instance = classeMethode.isStaticite() ? null : kl.getDeclaredConstructor().newInstance();
+
+                    if (Util.haveParameter(m, WebApplicationContext.class)) {
+                        if (this.springContext == null) {
+                            throw new Exception("Pas de springContext disponible");
+                        }
+                        result = m.invoke(instance, this.springContext);
+                    } else if (Util.haveParameter(m, jakarta.servlet.http.HttpServletRequest.class)
+                            && Util.haveParameter(m, jakarta.servlet.http.HttpServletResponse.class)) {
+                        result = m.invoke(instance, request, response);
                     } else {
-                        Object instance = kl.getDeclaredConstructor().newInstance();
                         result = m.invoke(instance, argumentsPourAppel);
                     }
                 
                     request.setAttribute("methodeNom", m.getName());
                     request.setAttribute("classeNom", kl.getSimpleName());
                 
-                    if (m.getReturnType() == void.class) {
+                    if (result instanceof ModelView) {
+    ModelView mv = (ModelView) result;
+    mv.getContenueView().forEach(request::setAttribute);
+    request.setAttribute("vueForward", mv.getNomView());
+} else if (m.getReturnType() == void.class) {
                         request.setAttribute("statusExecution", "Exécutée avec succès (void, aucun retour)");
                     } else if(m.getReturnType() != void.class) {
                         if (m.getReturnType() ==  ModelView.class){
@@ -159,35 +174,20 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     protected void executeFonction(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws jakarta.servlet.ServletException, java.io.IOException{
         response.setContentType("text/html;charset=UTF-8");
         Map<URLetMethodeHttps, ClasseMethodeMap> listeFiltree = this.FiltrerByUrl(request, response);
+        if (request.getDispatcherType() == jakarta.servlet.DispatcherType.FORWARD) {
+            request.getServletContext().getNamedDispatcher("jsp").forward(request, response);
+            return;
+        }
         if (!listeFiltree.isEmpty()) {
             this.TakeDonneByUrl(request, response, listeFiltree);
         }
-    }
-
-    protected void processRequest(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws jakarta.servlet.ServletException, java.io.IOException {
-     if (request.getDispatcherType() != jakarta.servlet.DispatcherType.REQUEST) {
-        // Requête interne (forward vers une JSP), interceptée via le mapping "/*".
-        // On la fait exécuter par le vrai moteur JSP de Tomcat au lieu de l'ignorer.
-        request.getServletContext().getNamedDispatcher("jsp").forward(request, response);
-        return;
-    }
-
-        this.executeFonction(request, response);
-        
-        // si c est ModelView
-        if((ModelView) request.getAttribute("ModelView") == null){
+        String vueForward = (String) request.getAttribute("vueForward");
+        if (vueForward != null) {
+            String chemin = this.packView + vueForward + "." + this.extensionView;
+            request.getRequestDispatcher(chemin).forward(request, response);
+        } else {
             this.Output(request, response);
-        }else if((ModelView) request.getAttribute("ModelView") != null){
-            ModelView a = (ModelView) request.getAttribute("ModelView");
-            Set<String> cle = a.getContenueView().keySet();
-            String premierElement = cle.stream()
-                             .findFirst()
-                             .orElse(null); // Renvoie null si le Set est vide
-            request.setAttribute(premierElement,a.getContenueView().get(premierElement));
-            request.getRequestDispatcher(prefixe+"/"+a.getNomView()+"."+suffixe).forward(request, response);
         }
-        
-
     }
  
     // output

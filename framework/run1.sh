@@ -10,11 +10,7 @@ fi
 mkdir -p bin
 
 # 2. Compile ton code
-<<<<<<< HEAD
-javac -cp "lib/servlet-api.jar" -d bin src/utils/ModelView.java  src/utils/URLetMethodeHttps.java src/utils/ClasseMethodeMap.java src/mg/itu/URLMapping.java src/utils/Scannerrrs.java src/mg/itu/Controller.java src/main/java/FrontControllerServlet.java 
-=======
-javac -cp "lib/servlet-api.jar" -d bin src/utils/URLetMethodeHttps.java src/utils/ClasseMethodeMap.java src/mg/itu/URLMapping.java src/utils/Scannerrrs.java src/mg/itu/Controller.java src/main/java/FrontControllerServlet.java 
->>>>>>> origin/sprint-3
+javac -cp "lib/servlet-api.jar:lib/spring-context-6.1.14.jar:lib/spring-web-6.1.14.jar:lib/spring-beans-6.1.14.jar:lib/spring-core-6.1.14.jar:lib/spring-expression-6.1.14.jar:lib/spring-jdbc-6.1.14.jar:lib/spring-jcl-6.1.14.jar" -d bin src/utils/ModelView.java src/utils/Util.java src/utils/URLetMethodeHttps.java src/utils/ClasseMethodeMap.java src/mg/itu/URLMapping.java src/utils/Scannerrrs.java src/mg/itu/Controller.java src/main/java/FrontControllerServlet.java src/main/java/FrontControllerListener.java 
 
 # 3. Crée le fichier JAR
 jar -cvf essai.jar -C bin .

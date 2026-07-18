@@ -5,6 +5,18 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
 http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
 version="2.4">
 <display-name>Application WEB affichant HelloWorld</display-name>
+<context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>/WEB-INF/applicationContext.xml</param-value>
+</context-param>
+
+<listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+</listener>
+
+<listener>
+    <listener-class>main.java.FrontControllerListener</listener-class>
+</listener>
 
 <servlet>
     <servlet-name>FrontController</servlet-name>
@@ -20,6 +32,10 @@ version="2.4">
     <init-param>
         <param-name>ExtensionView</param-name>
         <param-value>jsp</param-value>
+    </init-param>
+    <init-param>
+        <param-name>CheminClasses</param-name>
+        <param-value>/WEB-INF/classes</param-value>
     </init-param>
 </servlet>
     <servlet-mapping>
