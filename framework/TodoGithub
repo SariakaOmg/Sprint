@@ -21,3 +21,8 @@ git push origin SprintBranche
 Le commit est ta mémoire locale (sur ton ordinateur)
 git commit 💾 -> Tu crées un point de sauvegarde dans la mémoire de ton PC.
 git push 🚀 -> Tu envoies cette sauvegarde sur GitHub.
+
+Affichena anaty view ilay reponse fonction 
+preffixe, suffixe, Hashmap<key,ContenuedeVue> = afaka vakiana ilay ao anatin'ny Contenue de Vue iny no amena 
+Raha mireturn view ilay fonction, 
+

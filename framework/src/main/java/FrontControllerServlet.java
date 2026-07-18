@@ -11,6 +11,8 @@ import mg.itu.URLMapping;
 import utils.Scannerrrs;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
 import utils.ClasseMethodeMap;
 import utils.URLetMethodeHttps;
 import utils.Util;
@@ -123,10 +125,16 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     request.setAttribute("vueForward", mv.getNomView());
 } else if (m.getReturnType() == void.class) {
                         request.setAttribute("statusExecution", "Exécutée avec succès (void, aucun retour)");
-                    } else {
-                        request.setAttribute("statusExecution", "Retour : " + (result != null ? result.toString() : "null"));
-                    }
-                
+                    } else if(m.getReturnType() != void.class) {
+                        if (m.getReturnType() ==  ModelView.class){
+                            ModelView a = (ModelView) result;
+                            request.setAttribute("ModelView", a);
+                        }else{
+                            request.setAttribute("statusExecution", "Retour : " + (result != null ? result.toString() : "null"));
+                        }
+                    } 
+                    
+        
                 } catch (Exception e) {
                     request.setAttribute("erreurExecution", e.getMessage());
                 }
@@ -158,13 +166,13 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
         }if (this.listeUrMap3.get(urLetMethodeHttps) != null) {
             liste.put(urLetMethodeHttps,this.listeUrMap3.get(urLetMethodeHttps));
         }    
- 
         }
         return liste;
     }
+
     
-    protected void processRequest(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws jakarta.servlet.ServletException, java.io.IOException {
-    response.setContentType("text/html;charset=UTF-8");
+    protected void executeFonction(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws jakarta.servlet.ServletException, java.io.IOException{
+        response.setContentType("text/html;charset=UTF-8");
         Map<URLetMethodeHttps, ClasseMethodeMap> listeFiltree = this.FiltrerByUrl(request, response);
         if (request.getDispatcherType() == jakarta.servlet.DispatcherType.FORWARD) {
             request.getServletContext().getNamedDispatcher("jsp").forward(request, response);

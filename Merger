@@ -1,0 +1,17 @@
+# 1. Basculer sur la branche main
+git checkout main
+
+# 2. Récupérer les dernières modifications distantes (si vous travaillez à plusieurs)
+git pull origin main
+
+# 3. Fusionner Branche1 dans main
+git merge Branche1
+
+# 4. Fusionner Branche2 dans main
+git merge Branche2
+
+
+git push origin main
+
+# Renommer une branche :
+git branch -m ancien-nom nouveau-nom
