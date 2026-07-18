@@ -7,7 +7,7 @@ git fetch origin
 
 3. Te positionner sur Branche1
 Maintenant que ton Git local connaît l'existence de cette branche, tu peux basculer dessus en créant une copie locale synchronisée :
-git checkout -b Branche1 origin/Branche1
+git checkout -b SprintBranche origin/SprintBranche
 
 # 1. Ajoute ton dossier (ou "." pour tout ajouter d'un coup)
 git add .
@@ -16,7 +16,7 @@ git add .
 git commit -m "Fichier Framework 16Juin2026"
 
 # 3. Envoie le tout sur GitHub
-git push origin Branche1
+git push origin SprintBranche
 
 Le commit est ta mémoire locale (sur ton ordinateur)
 git commit 💾 -> Tu crées un point de sauvegarde dans la mémoire de ton PC.
