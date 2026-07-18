@@ -1,0 +1,23 @@
+1. Lier ton terminal à ton dépôt GitHub
+git remote add origin https://github.com/SariakaOmg/FrameworkSprint.git
+
+2. Récupérer les informations de GitHub
+Pour que ton PC sache quelles branches existent sur GitHub (notamment main et Branche1), fais un "fetch" :
+git fetch origin
+
+3. Te positionner sur Branche1
+Maintenant que ton Git local connaît l'existence de cette branche, tu peux basculer dessus en créant une copie locale synchronisée :
+git checkout -b SprintBranche origin/SprintBranche
+
+# 1. Ajoute ton dossier (ou "." pour tout ajouter d'un coup)
+git add .
+
+# 2. Crée le commit
+git commit -m "Fichier Framework 16Juin2026"
+
+# 3. Envoie le tout sur GitHub
+git push origin SprintBranche
+
+Le commit est ta mémoire locale (sur ton ordinateur)
+git commit 💾 -> Tu crées un point de sauvegarde dans la mémoire de ton PC.
+git push 🚀 -> Tu envoies cette sauvegarde sur GitHub.
