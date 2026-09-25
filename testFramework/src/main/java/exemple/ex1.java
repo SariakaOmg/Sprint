@@ -19,7 +19,6 @@ import exemple.service.MonObjetService;
 
 @Controller
 public class ex1 {
-    @WebRest
     @URLMapping(value="/sasa2", methode = "GET")
     public String fonctionExemple(){
         // System.out.println("OK11");
@@ -39,6 +38,7 @@ public class ex1 {
         return mv;
     }
 
+    @WebRest
     @URLMapping(value = "/fafa", methode = "GET")
 public ModelView afficherFafa(HttpServletRequest request, HttpServletResponse response) {
 

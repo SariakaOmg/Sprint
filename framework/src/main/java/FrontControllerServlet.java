@@ -120,7 +120,9 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                     request.setAttribute("methodeNom", m.getName());
                     request.setAttribute("classeNom", kl.getSimpleName());
                     
-                    
+                    if (result instanceof ModelView && classeMethode.isWebRest()) {
+                        throw new Exception("Erreur : Une méthode annotée avec @WebRest ne peut pas retourner un ModelView.");
+                    }
                     if (result instanceof ModelView && !classeMethode.isWebRest()) {
                         ModelView mv = (ModelView) result;
                         mv.getContenueView().forEach(request::setAttribute);
