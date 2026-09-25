@@ -12,6 +12,7 @@ import utils.Scannerrrs;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import com.google.gson.Gson;
 
 import utils.ClasseMethodeMap;
 import utils.URLetMethodeHttps;
@@ -118,23 +119,27 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                 
                     request.setAttribute("methodeNom", m.getName());
                     request.setAttribute("classeNom", kl.getSimpleName());
-                
-                    if (result instanceof ModelView) {
-    ModelView mv = (ModelView) result;
-    mv.getContenueView().forEach(request::setAttribute);
-    request.setAttribute("vueForward", mv.getNomView());
-} else if (m.getReturnType() == void.class) {
+                    
+                    
+                    if (result instanceof ModelView && !classeMethode.isWebRest()) {
+                        ModelView mv = (ModelView) result;
+                        mv.getContenueView().forEach(request::setAttribute);
+                        request.setAttribute("vueForward", mv.getNomView());
+                    } else if (m.getReturnType() == void.class) {
                         request.setAttribute("statusExecution", "Exécutée avec succès (void, aucun retour)");
                     } else if(m.getReturnType() != void.class) {
-                        if (m.getReturnType() ==  ModelView.class){
+                        if (m.getReturnType() ==  ModelView.class && !classeMethode.isWebRest()){
                             ModelView a = (ModelView) result;
                             request.setAttribute("ModelView", a);
                         }else{
                             request.setAttribute("statusExecution", "Retour : " + (result != null ? result.toString() : "null"));
+                            // faire en json le resultat
+                            Gson gson = new Gson();
+                            String json = gson.toJson(result);
+                            request.setAttribute("jsonResult", json);
                         }
                     } 
                     
-        
                 } catch (Exception e) {
                     request.setAttribute("erreurExecution", e.getMessage());
                 }
@@ -186,10 +191,22 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
             String chemin = this.packView + vueForward + "." + this.extensionView;
             request.getRequestDispatcher(chemin).forward(request, response);
         } else {
-            this.Output(request, response);
+            //this.Output(request, response);
+            
         }
     }
  
+    protected  void OutPutJson(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+        String jsonResult = (String) request.getAttribute("jsonResult");
+        if (jsonResult != null) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(jsonResult);
+        } else {
+            response.setContentType("text/html;charset=UTF-8");
+            response.getWriter().write("<html><body><h1>Aucun résultat JSON disponible</h1></body></html>");
+        }
+    }
     // output
     protected void Output(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
         String url = request.getRequestURI();
@@ -228,10 +245,10 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     }
  
     protected void doPost(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws jakarta.servlet.ServletException, java.io.IOException {
-        processRequest(request, response);
+        executeFonction(request, response);
     }
  
     protected void doGet(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws jakarta.servlet.ServletException, java.io.IOException {
-        processRequest(request, response);
+        executeFonction(request, response);
     }
 } 

@@ -11,6 +11,9 @@ public class ClasseMethodeMap {
     String nomMethode;
     Map<String, Class<?>> nomEtTyPeArg = new HashMap<>();
     boolean Staticite;
+    boolean WebRest;
+
+
     public Class<?> getKilasy() {
         return kilasy;
     }
@@ -25,7 +28,6 @@ public class ClasseMethodeMap {
     }
     public ClasseMethodeMap() {
     }
-    
     
     public ClasseMethodeMap(Class<?> kilasy, String nomMethode, Map<String, Class<?>> nomEtTyPeArg) {
         this.kilasy = kilasy;
@@ -69,5 +71,11 @@ public class ClasseMethodeMap {
     }
     public void setStaticite(boolean staticite) {
         Staticite = staticite;
+    }
+    public boolean isWebRest() {
+        return WebRest;
+    }
+    public void setWebRest(boolean webRest) {
+        WebRest = webRest;
     }
 }

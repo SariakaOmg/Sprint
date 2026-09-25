@@ -12,12 +12,14 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import mg.itu.Controller;
 import mg.itu.URLMapping;
+import mg.itu.WebRest;
 import utils.*;
 import exemple.model.MonObjet;
 import exemple.service.MonObjetService;
 
 @Controller
 public class ex1 {
+    @WebRest
     @URLMapping(value="/sasa2", methode = "GET")
     public String fonctionExemple(){
         // System.out.println("OK11");

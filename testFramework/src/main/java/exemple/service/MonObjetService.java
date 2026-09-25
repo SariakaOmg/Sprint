@@ -17,12 +17,12 @@ import exemple.model.MonObjet;
 public class MonObjetService {
 
     @Autowired
-    private DataSource dataSource; // bean déclaré dans applicationContext.xml
+    private DataSource dataSource; 
 
     public ArrayList<MonObjet> getDonneesPourFafa() {
         ArrayList<MonObjet> resultats = new ArrayList<>();
 
-        String requete = "SELECT id, nom FROM matable"; // adapte à ta vraie table
+        String requete = "SELECT id, nom FROM matable"; 
 
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement();

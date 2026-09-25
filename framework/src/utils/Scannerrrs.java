@@ -52,7 +52,11 @@ public class Scannerrrs {
                 if (method[i].isAnnotationPresent(mg.itu.URLMapping.class)) {
                     listePresentMapping1.add(kilasy.getName());//Classe
                     listePresentMapping1.add(method[i].getName());//Methode
-                    
+                    if (method[i].isAnnotationPresent(mg.itu.WebRest.class)) {
+                        listePresentMapping1.add("true");
+                    } else {
+                        listePresentMapping1.add("false");
+                    }
                     URLMapping um = method[i].getAnnotation(mg.itu.URLMapping.class);
                     listePresentMapping1.add(um.value());//URL
                     listePresentMapping1.add(um.methode());
@@ -69,6 +73,7 @@ public class Scannerrrs {
                ClasseMethodeMap cm = new ClasseMethodeMap();
                cm.setKilasy(Class.forName(listePresentMapping.get(index).get(0)));
                cm.setNomMethode(listePresentMapping.get(index).get(1));
+               cm.setWebRest(Boolean.parseBoolean(listePresentMapping.get(index).get(2)));
                URLetMethodeHttps urLetMethodeHttps = new URLetMethodeHttps();
                urLetMethodeHttps.setMethode(listePresentMapping.get(index).get(3));
                urLetMethodeHttps.setUrl(listePresentMapping.get(index).get(2));
