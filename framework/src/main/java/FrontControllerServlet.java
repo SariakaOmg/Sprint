@@ -128,7 +128,6 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                     } else if (m.getReturnType() == void.class) {
                         request.setAttribute("statusExecution", "Exécutée avec succès (void, aucun retour)");
                     } else if(m.getReturnType() != void.class) {
-                        request.setAttribute("jsonResult", "OKKEYG");
                         if (m.getReturnType() ==  ModelView.class && !classeMethode.isWebRest()){
                             ModelView a = (ModelView) result;
                             request.setAttribute("ModelView", a);
