@@ -17,4 +17,5 @@ Obj : tsy mande any am vue le url associe amle methode fa mamerina json
 cote framework : 
 - manampy annotation
 
+erreur : si l un  de mes controller n a pas de @Url Mapping alors elle exception 
 

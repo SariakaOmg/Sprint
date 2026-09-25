@@ -48,8 +48,8 @@ public class Scannerrrs {
             Class<?> kilasy = Class.forName(ListController.get(index));
             Method[] method = kilasy.getDeclaredMethods();
             for (int i = 0; i < method.length; i++) {
-                ArrayList<String> listePresentMapping1 = new ArrayList<>();
                 if (method[i].isAnnotationPresent(mg.itu.URLMapping.class)) {
+                    ArrayList<String> listePresentMapping1 = new ArrayList<>();
                     listePresentMapping1.add(kilasy.getName());//Classe
                     listePresentMapping1.add(method[i].getName());//Methode
                     if (method[i].isAnnotationPresent(mg.itu.WebRest.class)) {
@@ -60,8 +60,8 @@ public class Scannerrrs {
                     URLMapping um = method[i].getAnnotation(mg.itu.URLMapping.class);
                     listePresentMapping1.add(um.value());//URL
                     listePresentMapping1.add(um.methode());
+                    listePresentMapping.add(listePresentMapping1);
                 }
-                listePresentMapping.add(listePresentMapping1);
             }
         }
         return listePresentMapping;
