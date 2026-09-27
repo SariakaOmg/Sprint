@@ -12,6 +12,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import mg.itu.Controller;
 import mg.itu.URLMapping;
+import mg.itu.WebRest;
 import utils.*;
 import exemple.model.MonObjet;
 import exemple.service.MonObjetService;
@@ -37,6 +38,7 @@ public class ex1 {
         return mv;
     }
 
+    @WebRest
     @URLMapping(value = "/fafa", methode = "GET")
 public ModelView afficherFafa(HttpServletRequest request, HttpServletResponse response) {
 
