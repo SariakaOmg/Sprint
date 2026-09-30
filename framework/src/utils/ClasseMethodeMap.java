@@ -5,11 +5,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Map;
+import java.lang.reflect.Field;
 
 public class ClasseMethodeMap {
     Class<?> kilasy;
     String nomMethode;
-    Map<String, Class<?>> nomEtTyPeArg = new HashMap<>();
+    Map<String, Class<?>[]> nomEtTyPeArg = new HashMap<>();
     boolean Staticite;
     boolean WebRest;
 
@@ -29,7 +30,7 @@ public class ClasseMethodeMap {
     public ClasseMethodeMap() {
     }
     
-    public ClasseMethodeMap(Class<?> kilasy, String nomMethode, Map<String, Class<?>> nomEtTyPeArg) {
+    public ClasseMethodeMap(Class<?> kilasy, String nomMethode, Map<String, Class<?>[]> nomEtTyPeArg) {
         this.kilasy = kilasy;
         this.nomMethode = nomMethode;
         this.nomEtTyPeArg = nomEtTyPeArg;
@@ -46,8 +47,21 @@ public class ClasseMethodeMap {
         for (Parameter p : parameters) {
             String nomArgument = p.getName();          
             Class<?> typeArgument = p.getType();       
-    
-            this.nomEtTyPeArg.put(nomArgument, typeArgument);
+            if (typeArgument.getName().startsWith("exemple.model.")){
+                Field[] fields = typeArgument.getDeclaredFields();
+                for (Field field : fields) {
+                    String nomAttribut = field.getName()+"_"+nomArgument;
+                    Class<?> typeAttribut = field.getType();
+                    Class<?>[] args = new Class[2];
+                    args[0] = typeAttribut;
+                    args[1] = typeArgument;
+                    this.nomEtTyPeArg.put(nomAttribut, args);
+                }
+            }else {
+                Class<?>[] args = new Class[2];
+                args[0] = typeArgument;
+                this.nomEtTyPeArg.put(nomArgument, args);
+            }
         }
         // static ou pas
             int modificateurs = methode.getModifiers();
@@ -60,10 +74,10 @@ public class ClasseMethodeMap {
                 this.Staticite = false;
             }
     }
-    public Map<String, Class<?>> getNomEtTyPeArg() {
+    public Map<String, Class<?>[]> getNomEtTyPeArg() {
         return nomEtTyPeArg;
     }
-    public void setNomEtTyPeArg(Map<String, Class<?>> nomEtTyPeArg) {
+    public void setNomEtTyPeArg(Map<String, Class<?>[]> nomEtTyPeArg) {
         this.nomEtTyPeArg = nomEtTyPeArg;
     }
     public boolean isStaticite() {

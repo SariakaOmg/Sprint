@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.nio.file.Files;
 import java.util.stream.Stream;
 import mg.itu.URLMapping;
@@ -78,7 +79,10 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     protected void TakeDonneByUrl(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, Map<URLetMethodeHttps, ClasseMethodeMap> listeFiltree){
         listeFiltree.forEach((url, classeMethode) -> {
             Map<String, String[]> parameterMap = request.getParameterMap();
-            Map<String, Class<?>> parametermethode = classeMethode.getNomEtTyPeArg();
+            // class[0] ilay class attribut, class[1] ilay class an ilay objet
+            Map<String, Class<?>[]> parametermethode = classeMethode.getNomEtTyPeArg();
+            // Map de object complexe
+            Map<String, String[]> ObjectCOmplexe = new HashMap<>();
             
             Class<?> kl = classeMethode.getKilasy();
             Method[] methodkl = kl.getMethods();
@@ -91,10 +95,21 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
             }
             ArrayList<Object> temp = new ArrayList<>();
             parameterMap.forEach((nom, value)->{
-                Class<?> klas = parametermethode.get(nom);
+                Class<?>[] klas = parametermethode.get(nom);
                 if (klas != null){
-                Object arg = convertirArgument(value, klas);
-                temp.add(arg);
+                    if (klas[0] != null && klas[1] == null){
+                        Object arg = convertirArgument(value, klas[0]);
+                        temp.add(arg);
+                    } else if (klas[0] != null && klas[1] != null){
+                        Class<?> kil= klas[0];
+                        String kls = kil.getName();
+                        String[] str = new String[2];
+                        str[0] = kls;
+                        // a regarder value[0]
+                        str[1] = value[0];
+                        //
+                        ObjectCOmplexe.put(nom,str);
+                    }
                 }
             });
             Object[] argumentsPourAppel = new Object[temp.size()];
@@ -114,6 +129,11 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                             && Util.haveParameter(m, jakarta.servlet.http.HttpServletResponse.class)) {
                         result = m.invoke(instance, request, response);
                     } else {
+                        //Parameter[] p = m.getParameters();
+                        //for (int index = 0; index < p.length; index++) {
+                        //    String motchercher = p[index].getName();
+                        //    
+                        //}
                         result = m.invoke(instance, argumentsPourAppel);
                     }
                 
