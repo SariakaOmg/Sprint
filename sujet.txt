@@ -1,0 +1,11 @@
+formulaire -> framework -> instance objet
+- banging
+le donnee tonga 
+vue ->(alefa makany) controller 
+url mapper methode : ex : methode save(employe), click bouton , frontcontroller : mamantatra chemin, methode, misy parametre ve le url 
+de omeny valeur le parametre 
+rehefa misy objet alou des atao null : ohatra oe employe de atao null. fa juste oe argument tsotra string, int 
+atao mi-correspondre nom ilay izy. methode save(string nom) de ze nom ao amin ny url no atao ao 
+
+todo :
+mampiditra gson.jar sprint6:

@@ -76,6 +76,7 @@ public class Scannerrrs {
                cm.setKilasy(Class.forName(listePresentMapping.get(index).get(0)));
                cm.setNomMethode(listePresentMapping.get(index).get(1));
                cm.setWebRest(Boolean.parseBoolean(listePresentMapping.get(index).get(4)));
+               cm.CompletMethods();
                URLetMethodeHttps urLetMethodeHttps = new URLetMethodeHttps();
                urLetMethodeHttps.setMethode(listePresentMapping.get(index).get(3));
                urLetMethodeHttps.setUrl(listePresentMapping.get(index).get(2));
