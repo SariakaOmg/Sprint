@@ -10,3 +10,4 @@ atao mi-correspondre nom ilay izy. methode save(string nom) de ze nom ao amin ny
 todo :
 mampiditra gson.jar sprint6:
 Mettre les arguments et les parametre de fonction sur le fonction si c est ObjetCOmplexe : 
+si le parametre est un tableau : 
