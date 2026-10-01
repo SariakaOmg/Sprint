@@ -142,15 +142,16 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                         for (int index = 0; index < p.length; index++) {
                             String nomParametre = p[index].getName();
                             Class<?> typeParametre = p[index].getType();
+                            if(typeParametre.getPackageName().equals("exemple.model")){
                             Map<String, Object> pc = new HashMap<>();
-                            int indice = 0;
+                            int indice = -1;
                             for (Map.Entry<String, String[]> entry : ObjectCOmplexe.entrySet()) {
                                 String nomComplexe = entry.getKey();
                                 String apreNomComplexe = nomComplexe.substring(nomComplexe.indexOf("_") + 1);
                                 String AvantNomComplexe = nomComplexe.substring(0, nomComplexe.indexOf("_"));
                                 String[] valeurComplexe = entry.getValue();
                                 if (nomParametre.equals(apreNomComplexe) && apreNomComplexe != null && AvantNomComplexe != null) {
-                                    pc.put(AvantNomComplexe, valeurComplexe[0]);
+                                    pc.put(AvantNomComplexe, valeurComplexe[1]);
                                     indice = index;
                                 }
                             }
@@ -161,8 +162,10 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                                 Object ValeurConvertie = convertirArgument(new String[]{(String) entry.getValue()}, typeAttendu);
                                 method.invoke(b, ValeurConvertie);
                             }
-                            if(indice != 0)
+                            if(indice != -1)
                             {finalE.put(indice, b);}
+                            }
+                             
                         }
                         ArrayList<Object> argslist = new ArrayList<>();
                         int taille = argumentsPourAppel.length + finalE.size();
@@ -170,9 +173,15 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                             if (finalE.containsKey(i)) {
                                 argslist.add(finalE.get(i));
                             }
+                            if(argumentsPourAppel.length != 0){
                             argslist.add(argumentsPourAppel[i]);
+                            }
                         }
-                        result = m.invoke(instance, argumentsPourAppel);
+                        Object[] arguments = argslist.toArray();
+                        for (int i = 0; i < arguments.length; i++) {
+                            arguments[i] = argslist.get(i);
+                        }
+                        result = m.invoke(instance, arguments);
                     }
                 
                     request.setAttribute("methodeNom", m.getName());

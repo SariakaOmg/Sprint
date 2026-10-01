@@ -3,6 +3,7 @@ import mg.itu.Param;
 import mg.itu.URLMapping;
 import mg.itu.WebRest;
 import mg.itu.Param;
+import exemple.model.MonObjet;
 @Controller
 public class exemple {
     @URLMapping(value = "/sasa/exam" , methode = "GET")
@@ -17,7 +18,7 @@ public class exemple {
 
     @WebRest 
     @URLMapping(value = "/sasa3/exam" , methode = "GET")
-    public String FonctionExemple3(@Param("param1") String param1, @Param("param2") String param2, @Param("param3") String param3){
-        return param1 + " et " + param2 + " et " + param3;
+    public String FonctionExemple3(@Param("Objet1") MonObjet Objet1, @Param("Objet2") MonObjet Objet2){
+        return Objet1.getNom() + " et " + Objet2.getNom();
     }
 }
