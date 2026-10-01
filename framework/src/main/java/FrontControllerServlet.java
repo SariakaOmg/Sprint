@@ -75,6 +75,14 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     
     return premiereValeur; 
     }
+    private Method trouverSetter(Class<?> clazz, String nomSetter) {
+    for (Method m : clazz.getMethods()) {
+        if (m.getName().equalsIgnoreCase(nomSetter) && m.getParameterCount() == 1) {
+            return m;
+        }
+    }
+    return null;
+}
     //maka donnee by url
     protected void TakeDonneByUrl(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, Map<URLetMethodeHttps, ClasseMethodeMap> listeFiltree){
         listeFiltree.forEach((url, classeMethode) -> {
@@ -129,11 +137,41 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                             && Util.haveParameter(m, jakarta.servlet.http.HttpServletResponse.class)) {
                         result = m.invoke(instance, request, response);
                     } else {
-                        //Parameter[] p = m.getParameters();
-                        //for (int index = 0; index < p.length; index++) {
-                        //    String motchercher = p[index].getName();
-                        //    
-                        //}
+                        Parameter[] p = m.getParameters();
+                        Map<Integer, Object> finalE = new HashMap<>();
+                        for (int index = 0; index < p.length; index++) {
+                            String nomParametre = p[index].getName();
+                            Class<?> typeParametre = p[index].getType();
+                            Map<String, Object> pc = new HashMap<>();
+                            int indice = 0;
+                            for (Map.Entry<String, String[]> entry : ObjectCOmplexe.entrySet()) {
+                                String nomComplexe = entry.getKey();
+                                String apreNomComplexe = nomComplexe.substring(nomComplexe.indexOf("_") + 1);
+                                String AvantNomComplexe = nomComplexe.substring(0, nomComplexe.indexOf("_"));
+                                String[] valeurComplexe = entry.getValue();
+                                if (nomParametre.equals(apreNomComplexe) && apreNomComplexe != null && AvantNomComplexe != null) {
+                                    pc.put(AvantNomComplexe, valeurComplexe[0]);
+                                    indice = index;
+                                }
+                            }
+                            Object b = typeParametre.getDeclaredConstructor().newInstance();
+                            for (Map.Entry<String, Object> entry : pc.entrySet()) {
+                                Method method = trouverSetter(typeParametre, "set" + entry.getKey());
+                                Class<?> typeAttendu = method.getParameterTypes()[0];
+                                Object ValeurConvertie = convertirArgument(new String[]{(String) entry.getValue()}, typeAttendu);
+                                method.invoke(b, ValeurConvertie);
+                            }
+                            if(indice != 0)
+                            {finalE.put(indice, b);}
+                        }
+                        ArrayList<Object> argslist = new ArrayList<>();
+                        int taille = argumentsPourAppel.length + finalE.size();
+                        for (int i = 0; i < taille; i++) {
+                            if (finalE.containsKey(i)) {
+                                argslist.add(finalE.get(i));
+                            }
+                            argslist.add(argumentsPourAppel[i]);
+                        }
                         result = m.invoke(instance, argumentsPourAppel);
                     }
                 
