@@ -101,6 +101,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                     m = method;
                 }
             }
+            
             ArrayList<Object> temp = new ArrayList<>();
             parameterMap.forEach((nom, value)->{
                 Class<?>[] klas = parametermethode.get(nom);
@@ -167,21 +168,35 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                             }
                              
                         }
-                        ArrayList<Object> argslist = new ArrayList<>();
-                        int taille = argumentsPourAppel.length + finalE.size();
-                        for (int i = 0; i < taille; i++) {
-                            if (finalE.containsKey(i)) {
-                                argslist.add(finalE.get(i));
-                            }
-                            if(argumentsPourAppel.length != 0){
-                            argslist.add(argumentsPourAppel[i]);
+                        //int taille = argumentsPourAppel.length + finalE.size();
+                        //Object[] argslist = new Object[taille];
+                        //for (int i = 0; i < taille; i++) {
+                        //    if (finalE.containsKey(i)) {
+                        //        argslist[i] = finalE.get(i);
+                        //    }
+                        //    if(argumentsPourAppel.length != 0){
+                        //    argslist[i] = argumentsPourAppel[i];
+                        //    }
+                        //}
+                        //Object[] arguments = argslist.toArray();
+                        //for (int i = 0; i < arguments.length; i++) {
+                        //    arguments[i] = argslist.get(i);
+                        //}
+                        //result = m.invoke(instance, argslist);
+                        Object[] args = new Object[p.length];
+
+                        for (Map.Entry<Integer, Object> e : finalE.entrySet()) {
+                            args[e.getKey()] = e.getValue();
+                        }
+                        
+                        int j = 0;
+                        for (int i = 0; i < args.length; i++) {
+                            if (args[i] == null && j < argumentsPourAppel.length) {
+                                args[i] = argumentsPourAppel[j++];
                             }
                         }
-                        Object[] arguments = argslist.toArray();
-                        for (int i = 0; i < arguments.length; i++) {
-                            arguments[i] = argslist.get(i);
-                        }
-                        result = m.invoke(instance, arguments);
+                        
+                        result = m.invoke(instance, args);
                     }
                 
                     request.setAttribute("methodeNom", m.getName());
