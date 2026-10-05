@@ -10,6 +10,7 @@ public class exemple {
     public void FonctionExemple(){
         System.out.println("OK");
     }
+    
     @WebRest
     @URLMapping(value = "/sasa2/exam" , methode = "GET")
     public String FonctionExemple2(@Param("param1") int param1, @Param("param2") String param2){
@@ -20,6 +21,11 @@ public class exemple {
     @URLMapping(value = "/sasa3/exam" , methode = "GET")
     public String FonctionExemple3(@Param("Objet1") MonObjet Objet1, @Param("Objet2") MonObjet Objet2, @Param("NameHasard") String NameHasard){
         return Objet1.getNom() + " et " + Objet2.getNom() + " et " + NameHasard;
+    }
+
+    @URLMapping(value = "/sasa5/exam" , methode = "GET")
+    public String FonctionExemple5(@Param("Objet1") MonObjet Objet1, @Param("Objet2") MonObjet Objet2, @Param("NameHasard1") String NameHasard1, @Param("NameHasard2") String NameHasard2, @Param("NameHasard3") String NameHasard3){
+        return Objet1.getNom() + " et " + Objet2.getNom() + " et " + NameHasard1 + " et " + NameHasard2 + " et " + NameHasard3;
     }
 
     @WebRest 

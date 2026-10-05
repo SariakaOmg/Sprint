@@ -87,9 +87,16 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     protected void TakeDonneByUrl(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, Map<URLetMethodeHttps, ClasseMethodeMap> listeFiltree){
         listeFiltree.forEach((url, classeMethode) -> {
             Map<String, String[]> parameterMap = request.getParameterMap();
+            Map<String, String[]> parametresFiltrees = new HashMap<>();
             // class[0] ilay class attribut, class[1] ilay class an ilay objet
             Map<String, Class<?>[]> parametermethode = classeMethode.getNomEtTyPeArg();
             // Map de object complexe
+            parametermethode.forEach((nom, value)->{
+                String[] paramValue = parameterMap.get(nom);
+                if (paramValue != null) {
+                    parametresFiltrees.put(nom, paramValue);
+                }
+            });
             Map<String, String[]> ObjectCOmplexe = new HashMap<>();
             
             Class<?> kl = classeMethode.getKilasy();
@@ -102,9 +109,11 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                 }
             }
             
+            
             ArrayList<Object> temp = new ArrayList<>();
-            parameterMap.forEach((nom, value)->{
-                Class<?>[] klas = parametermethode.get(nom);
+            parametermethode.forEach((nom, klas)->{
+                String[] value = parameterMap.get(nom);
+                if (value == null) return;
                 if (klas != null){
                     if (klas[0] != null && klas[1] == null){
                         Object arg = convertirArgument(value, klas[0]);

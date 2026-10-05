@@ -3,14 +3,15 @@ package utils;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.lang.reflect.Field;
+import mg.itu.Param;
 
 public class ClasseMethodeMap {
     Class<?> kilasy;
     String nomMethode;
-    Map<String, Class<?>[]> nomEtTyPeArg = new HashMap<>();
+    Map<String, Class<?>[]> nomEtTyPeArg = new LinkedHashMap<>();
     boolean Staticite;
     boolean WebRest;
 
@@ -45,7 +46,8 @@ public class ClasseMethodeMap {
         // les type de arguments
         Parameter[] parameters = methode.getParameters();
         for (Parameter p : parameters) {
-            String nomArgument = p.getName();          
+            Param annotation = p.getAnnotation(Param.class);
+            String nomArgument = annotation != null ? annotation.value() : p.getName();
             Class<?> typeArgument = p.getType();       
             if (typeArgument.getName().startsWith("exemple.model.")){
                 Field[] fields = typeArgument.getDeclaredFields();

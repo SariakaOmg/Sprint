@@ -11,3 +11,5 @@ todo :
 mampiditra gson.jar sprint6:
 Mettre les arguments et les parametre de fonction sur le fonction si c est ObjetCOmplexe : 
 si le parametre est un tableau : 
+
+Ampiana annotation table : 
