@@ -2,6 +2,7 @@ import mg.itu.Controller;
 import mg.itu.Param;
 import mg.itu.URLMapping;
 import mg.itu.WebRest;
+import utils.ModelView;
 import mg.itu.Param;
 
 import java.util.ArrayList;
@@ -9,6 +10,12 @@ import java.util.ArrayList;
 import exemple.model.MonObjet;
 @Controller
 public class exemple {
+
+    @URLMapping(value = "/showForm", methode = "GET")
+    public ModelView showForm() {
+        return new ModelView("form", null);
+    }
+
     @URLMapping(value = "/sasa/exam" , methode = "GET")
     public ArrayList<String> FonctionExemple(){
         System.out.println("OK");
@@ -52,4 +59,10 @@ public class exemple {
     public String FonctionExemple4(@Param("Objet1") MonObjet Objet1, @Param("Objet2") MonObjet Objet2){
         return Objet1.getNom() + " et " + Objet2.getNom();
     }
+
+    @WebRest
+@URLMapping(value = "/MonObjetAppel", methode = "GET")
+public String FonctionMonObjetAppel(@Param("Objet1") MonObjet Objet1){
+    return Objet1.getNom() + " et " + Objet1.getId();
+}
 }

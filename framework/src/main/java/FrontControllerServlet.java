@@ -241,7 +241,9 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                     }
                     if (result instanceof ModelView && !classeMethode.isWebRest()) {
                         ModelView mv = (ModelView) result;
-                        mv.getContenueView().forEach(request::setAttribute);
+                        if (mv.getContenueView() != null) {
+                            mv.getContenueView().forEach(request::setAttribute);
+                        }
                         request.setAttribute("vueForward", mv.getNomView());
                     } else if (m.getReturnType() == void.class) {
                         request.setAttribute("statusExecution", "Exécutée avec succès (void, aucun retour)");
