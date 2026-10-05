@@ -26,8 +26,8 @@ public class exemple {
 
     @WebRest
     @URLMapping(value = "/sasa6/exam" , methode = "GET")
-    public String FonctionExemple6(@Param("param1") int[] param1, @Param("param2") String[] param2){
-        return param1[0] + " et " + param2[1];
+    public String FonctionExemple6(@Param("Objet11") MonObjet[] Objet1, @Param("param2") String param2){
+        return Objet1[0].getNom() + " et " + param2;
     }
 
     @WebRest 
