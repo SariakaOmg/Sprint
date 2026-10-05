@@ -185,8 +185,8 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                                 String AvantNomComplexe = nomComplexe.substring(0, nomComplexe.indexOf("_"));
                                 String[] valeurComplexe = entry.getValue();
                                 if (nomParametre.equals(apreNomComplexe) && apreNomComplexe != null && AvantNomComplexe != null) {
-                                    pc.put(AvantNomComplexe, valeurComplexe);
-                                    //pc.put(AvantNomComplexe, valeurComplexe[1]);
+                                    //pc.put(AvantNomComplexe, valeurComplexe);
+                                    pc.put(AvantNomComplexe, valeurComplexe[1]);
                                     indice = index;
                                 }
                             }

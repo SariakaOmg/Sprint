@@ -13,3 +13,5 @@ Mettre les arguments et les parametre de fonction sur le fonction si c est Objet
 si le parametre est un tableau : 
 
 Ampiana annotation table : 
+mbola ts mety :
+- tableau objet comme argument
