@@ -62,7 +62,8 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     }
  
     String premiereValeur = valeurs[0]; 
- 
+
+    if(valeurs.length == 1){
     if (typeAttendu == String.class) {
         return premiereValeur;
     } else if (typeAttendu == int.class || typeAttendu == Integer.class) {
@@ -72,8 +73,32 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     } else if (typeAttendu == boolean.class || typeAttendu == Boolean.class) {
         return Boolean.parseBoolean(premiereValeur);
     }
-    
     return premiereValeur; 
+    }else if(valeurs.length > 1){
+        if (typeAttendu == String[].class) {
+            return valeurs;
+        } else if (typeAttendu == int[].class) {
+            int[] intArray = new int[valeurs.length];
+            for (int i = 0; i < valeurs.length; i++) {
+                intArray[i] = Integer.parseInt(valeurs[i]);
+            }
+            return intArray;
+        } else if (typeAttendu == double[].class) {
+            double[] doubleArray = new double[valeurs.length];
+            for (int i = 0; i < valeurs.length; i++) {
+                doubleArray[i] = Double.parseDouble(valeurs[i]);
+            }
+            return doubleArray;
+        } else if (typeAttendu == boolean[].class) {
+            boolean[] booleanArray = new boolean[valeurs.length];
+            for (int i = 0; i < valeurs.length; i++) {
+                booleanArray[i] = Boolean.parseBoolean(valeurs[i]);
+            }
+            return booleanArray;
+        }
+    }
+    
+    return null;
     }
     private Method trouverSetter(Class<?> clazz, String nomSetter) {
     for (Method m : clazz.getMethods()) {
@@ -108,7 +133,6 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                     m = method;
                 }
             }
-            
             
             ArrayList<Object> temp = new ArrayList<>();
             parametermethode.forEach((nom, klas)->{

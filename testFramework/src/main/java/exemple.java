@@ -3,18 +3,31 @@ import mg.itu.Param;
 import mg.itu.URLMapping;
 import mg.itu.WebRest;
 import mg.itu.Param;
+
+import java.util.ArrayList;
+
 import exemple.model.MonObjet;
 @Controller
 public class exemple {
     @URLMapping(value = "/sasa/exam" , methode = "GET")
-    public void FonctionExemple(){
+    public ArrayList<String> FonctionExemple(){
         System.out.println("OK");
+        ArrayList<String> fruits = new ArrayList<>();
+        fruits.add("Maka");
+        fruits.add("Fafa");
+        return fruits;
     }
     
     @WebRest
     @URLMapping(value = "/sasa2/exam" , methode = "GET")
     public String FonctionExemple2(@Param("param1") int param1, @Param("param2") String param2){
         return param1 + " et " + param2;
+    }
+
+    @WebRest
+    @URLMapping(value = "/sasa6/exam" , methode = "GET")
+    public String FonctionExemple6(@Param("param1") int[] param1, @Param("param2") String[] param2){
+        return param1[0] + " et " + param2[1];
     }
 
     @WebRest 
