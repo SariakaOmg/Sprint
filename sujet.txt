@@ -15,3 +15,4 @@ si le parametre est un tableau :
 Ampiana annotation table : 
 mbola ts mety :
 - tableau objet comme argument
+idee : ilay ObjetCOmplexe atao Map<string, Map<string, string[]>>

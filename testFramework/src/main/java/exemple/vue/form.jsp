@@ -12,7 +12,7 @@
         <label for="nom">Nom :</label>
         <input type="text" id="nom_Objet1" name="nom_Objet1" required><br><br>
 
-        <button type="submit">Submit</button>
+        <button type="submit">Submitee</button>
     </form>
 </body>
 </html>
