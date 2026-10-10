@@ -1,6 +1,6 @@
 package main.java;
 import jakarta.servlet.ServletException;
- 
+import utils.ObjetC;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -14,7 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import com.google.gson.Gson;
-
+import utils.Accesseur;
+import utils.*;
 import utils.ClasseMethodeMap;
 import utils.URLetMethodeHttps;
 import utils.Util;
@@ -43,6 +44,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
         this.extensionView = getInitParameter("ExtensionView") != null ? getInitParameter("ExtensionView") : "jsp";
         try {
             ArrayList<ArrayList<String>> scanResultMap = Scannerrrs.ScannerURLMapping(chemine, packageContr);
+           // Scannerrrs.ScannerObjetDansObjet(chemine, packageContr);
             this.listeUrMap3 = Scannerrrs.MettreDansMap(scanResultMap);
             this.Errer = "";
         } catch (Exception e) {
@@ -51,55 +53,96 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
         this.springContext = (WebApplicationContext) getServletContext().getAttribute("springContext");
     }
  
+    // public static void GenererFonctionGetters(Class<?> kilasySup, String NomMethode, Class<?> typeDeRetour){
+
+    // }
+    // public static void GenererFonctionSetters(Class<?> kilasySup, String NomMethode, Class<?> TypeArg){
+
+    // }
     //
+    // private Object convertirArgument(String[] valeurs, Class<?> typeAttendu) {
+    // if (valeurs == null || valeurs.length == 0) {
+    //     if (typeAttendu.isPrimitive()) {
+    //         if (typeAttendu == boolean.class) return false;
+    //         return 0; 
+    //     }
+    //     return null; 
+    // }
+ 
+    // String premiereValeur = valeurs[0]; 
+
+    // if(valeurs.length == 1){
+    // if (typeAttendu == String.class) {
+    //     return premiereValeur;
+    // } else if (typeAttendu == int.class || typeAttendu == Integer.class) {
+    //     return Integer.parseInt(premiereValeur);
+    // } else if (typeAttendu == double.class || typeAttendu == Double.class) {
+    //     return Double.parseDouble(premiereValeur);
+    // } else if (typeAttendu == boolean.class || typeAttendu == Boolean.class) {
+    //     return Boolean.parseBoolean(premiereValeur);
+    // }
+    // return premiereValeur; 
+    // }else if(valeurs.length > 1){
+    //     if (typeAttendu == String[].class) {
+    //         return valeurs;
+    //     } else if (typeAttendu == int[].class) {
+    //         int[] intArray = new int[valeurs.length];
+    //         for (int i = 0; i < valeurs.length; i++) {
+    //             intArray[i] = Integer.parseInt(valeurs[i]);
+    //         }
+    //         return intArray;
+    //     } else if (typeAttendu == double[].class) {
+    //         double[] doubleArray = new double[valeurs.length];
+    //         for (int i = 0; i < valeurs.length; i++) {
+    //             doubleArray[i] = Double.parseDouble(valeurs[i]);
+    //         }
+    //         return doubleArray;
+    //     } else if (typeAttendu == boolean[].class) {
+    //         boolean[] booleanArray = new boolean[valeurs.length];
+    //         for (int i = 0; i < valeurs.length; i++) {
+    //             booleanArray[i] = Boolean.parseBoolean(valeurs[i]);
+    //         }
+    //         return booleanArray;
+    //     }
+    // }
+
+    
+    
+    // return null;
+    // }
+
     private Object convertirArgument(String[] valeurs, Class<?> typeAttendu) {
     if (valeurs == null || valeurs.length == 0) {
-        if (typeAttendu.isPrimitive()) {
-            if (typeAttendu == boolean.class) return false;
-            return 0; 
-        }
-        return null; 
+        if (typeAttendu.isPrimitive()) return typeAttendu == boolean.class ? (Object) false : (Object) 0;
+        return null;
     }
- 
-    String premiereValeur = valeurs[0]; 
 
-    if(valeurs.length == 1){
-    if (typeAttendu == String.class) {
-        return premiereValeur;
-    } else if (typeAttendu == int.class || typeAttendu == Integer.class) {
-        return Integer.parseInt(premiereValeur);
-    } else if (typeAttendu == double.class || typeAttendu == Double.class) {
-        return Double.parseDouble(premiereValeur);
-    } else if (typeAttendu == boolean.class || typeAttendu == Boolean.class) {
-        return Boolean.parseBoolean(premiereValeur);
+    // Tableaux (1 ou plusieurs valeurs)
+    if (typeAttendu == String[].class) return valeurs;
+    if (typeAttendu == int[].class) {
+        int[] a = new int[valeurs.length];
+        for (int i = 0; i < a.length; i++) a[i] = Integer.parseInt(valeurs[i]);
+        return a;
     }
-    return premiereValeur; 
-    }else if(valeurs.length > 1){
-        if (typeAttendu == String[].class) {
-            return valeurs;
-        } else if (typeAttendu == int[].class) {
-            int[] intArray = new int[valeurs.length];
-            for (int i = 0; i < valeurs.length; i++) {
-                intArray[i] = Integer.parseInt(valeurs[i]);
-            }
-            return intArray;
-        } else if (typeAttendu == double[].class) {
-            double[] doubleArray = new double[valeurs.length];
-            for (int i = 0; i < valeurs.length; i++) {
-                doubleArray[i] = Double.parseDouble(valeurs[i]);
-            }
-            return doubleArray;
-        } else if (typeAttendu == boolean[].class) {
-            boolean[] booleanArray = new boolean[valeurs.length];
-            for (int i = 0; i < valeurs.length; i++) {
-                booleanArray[i] = Boolean.parseBoolean(valeurs[i]);
-            }
-            return booleanArray;
-        }
+    if (typeAttendu == double[].class) {
+        double[] a = new double[valeurs.length];
+        for (int i = 0; i < a.length; i++) a[i] = Double.parseDouble(valeurs[i]);
+        return a;
     }
-    
-    return null;
+    if (typeAttendu == boolean[].class) {
+        boolean[] a = new boolean[valeurs.length];
+        for (int i = 0; i < a.length; i++) a[i] = Boolean.parseBoolean(valeurs[i]);
+        return a;
     }
+
+    // Valeurs simples
+    String v = valeurs[0];
+    if (typeAttendu == int.class || typeAttendu == Integer.class) return Integer.parseInt(v);
+    if (typeAttendu == double.class || typeAttendu == Double.class) return Double.parseDouble(v);
+    if (typeAttendu == boolean.class || typeAttendu == Boolean.class) return Boolean.parseBoolean(v);
+    return v;
+}
+
     private Method trouverSetter(Class<?> clazz, String nomSetter) {
     for (Method m : clazz.getMethods()) {
         if (m.getName().equalsIgnoreCase(nomSetter) && m.getParameterCount() == 1) {
@@ -122,7 +165,9 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                     parametresFiltrees.put(nom, paramValue);
                 }
             });
-            Map<String, String[]> ObjectCOmplexe = new HashMap<>();
+            
+            // Map<String, String[]> ObjectCOmplexe = new HashMap<>();
+            Map<String, ObjetC> ObjetCOmplexeMap = new HashMap<>();
             
             Class<?> kl = classeMethode.getKilasy();
             Method[] methodkl = kl.getMethods();
@@ -149,8 +194,13 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                         str[0] = kls;
                         // a regarder value[0]
                         str[1] = value[0];
-                        //
-                        ObjectCOmplexe.put(nom,str);
+                        /////
+                        // Map<String, String[]> maptemp = new HashMap<>();
+                        // maptemp.put(kls, value);
+                        ObjetC o = new ObjetC(kls, value);
+                        ObjetCOmplexeMap.put(nom, o);
+                        /////
+                        // ObjectCOmplexe.put(nom,str);
                     }
                 }
             });
@@ -177,46 +227,66 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                             String nomParametre = p[index].getName();
                             Class<?> typeParametre = p[index].getType();
                             if(typeParametre.getPackageName().equals("exemple.model")){
-                            Map<String, Object> pc = new HashMap<>();
+                            Map<String, String[]> pc = new HashMap<>();
                             int indice = -1;
-                            for (Map.Entry<String, String[]> entry : ObjectCOmplexe.entrySet()) {
+                            int indice2 = -1;
+                            for (Map.Entry<String, ObjetC> entry : ObjetCOmplexeMap.entrySet()) {
                                 String nomComplexe = entry.getKey();
-                                String apreNomComplexe = nomComplexe.substring(nomComplexe.indexOf("_") + 1);
-                                String AvantNomComplexe = nomComplexe.substring(0, nomComplexe.indexOf("_"));
-                                String[] valeurComplexe = entry.getValue();
+                                int lastIndex = nomComplexe.lastIndexOf("_");
+
+                                    String AvantNomComplexe = nomComplexe;
+                                    String apreNomComplexe = "";
+
+                                if (lastIndex != -1) {
+                                    AvantNomComplexe = nomComplexe.substring(0, lastIndex);
+                                    apreNomComplexe = nomComplexe.substring(lastIndex + 1);
+                                }
+                                ObjetC oc = entry.getValue();
+                                String[] valeurComplexe = oc.getValues();
                                 if (nomParametre.equals(apreNomComplexe) && apreNomComplexe != null && AvantNomComplexe != null) {
                                     //pc.put(AvantNomComplexe, valeurComplexe);
-                                    pc.put(AvantNomComplexe, valeurComplexe[1]);
+                                    pc.put(AvantNomComplexe, valeurComplexe);
                                     indice = index;
                                 }
                             }
+                            //////////////
+                            // for (Map.Entry<String, String[]> entry : ObjectCOmplexe.entrySet()) {
+                            //     String nomComplexe = entry.getKey();
+                            //     int lastIndex = nomComplexe.lastIndexOf("_");
+
+                            //         String AvantNomComplexe = nomComplexe;
+                            //         String apreNomComplexe = "";
+
+                            //     if (lastIndex != -1) {
+                            //         AvantNomComplexe = nomComplexe.substring(0, lastIndex);
+                            //         apreNomComplexe = nomComplexe.substring(lastIndex + 1);
+                            //     } 
+                                    
+                            //     //String apreNomComplexe = nomComplexe.substring(nomComplexe.indexOf("_") + 1);
+                            //     //String AvantNomComplexe = nomComplexe.substring(0, nomComplexe.indexOf("_"));
+                            //     String[] valeurComplexe = entry.getValue();
+                            //     if (nomParametre.equals(apreNomComplexe) && apreNomComplexe != null && AvantNomComplexe != null) {
+                            //         //pc.put(AvantNomComplexe, valeurComplexe);
+                            //         pc.put(AvantNomComplexe, valeurComplexe[1]);
+                            //         indice = index;
+                            //     }
+                            // }
+                            ///
                             Object b = typeParametre.getDeclaredConstructor().newInstance();
-                            for (Map.Entry<String, Object> entry : pc.entrySet()) {
-                                Method method = trouverSetter(typeParametre, "set" + entry.getKey());
-                                Class<?> typeAttendu = method.getParameterTypes()[0];
-                                Object ValeurConvertie = convertirArgument(new String[]{(String) entry.getValue()}, typeAttendu);
-                                method.invoke(b, ValeurConvertie);
+                            for (Map.Entry<String, String[]> entry : pc.entrySet()) {
+                                // Method method = trouverSetter(typeParametre, "set" + entry.getKey());
+                                // Class<?> typeAttendu = method.getParameterTypes()[0];
+                                // Object ValeurConvertie = convertirArgument(entry.getValue(), typeAttendu);
+                                // method.invoke(b, ValeurConvertie);
+                                Accesseur acc = RegistreAccesseurs.pour(typeParametre).get(entry.getKey());
+                                acc.set(b, entry.getValue());
                             }
                             if(indice != -1)
                             {finalE.put(indice, b);}
                             }
                              
                         }
-                        //int taille = argumentsPourAppel.length + finalE.size();
-                        //Object[] argslist = new Object[taille];
-                        //for (int i = 0; i < taille; i++) {
-                        //    if (finalE.containsKey(i)) {
-                        //        argslist[i] = finalE.get(i);
-                        //    }
-                        //    if(argumentsPourAppel.length != 0){
-                        //    argslist[i] = argumentsPourAppel[i];
-                        //    }
-                        //}
-                        //Object[] arguments = argslist.toArray();
-                        //for (int i = 0; i < arguments.length; i++) {
-                        //    arguments[i] = argslist.get(i);
-                        //}
-                        //result = m.invoke(instance, argslist);
+                        
                         Object[] args = new Object[p.length];
 
                         for (Map.Entry<Integer, Object> e : finalE.entrySet()) {

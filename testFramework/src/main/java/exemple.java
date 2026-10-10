@@ -8,6 +8,7 @@ import mg.itu.Param;
 import java.util.ArrayList;
 
 import exemple.model.MonObjet;
+import exemple.model.MonObjet2;
 @Controller
 public class exemple {
 
@@ -25,24 +26,28 @@ public class exemple {
         return fruits;
     }
     
+    // /sasa2/exam?param1=5&param2=Fafa
     @WebRest
     @URLMapping(value = "/sasa2/exam" , methode = "POST")
     public String FonctionExemple2(@Param("param1") int param1, @Param("param2") String param2){
         return param1 + " et " + param2;
     }
 
+    // /sasa6/exam?id_Objet1=1&nom_Objet1=Fafa&param2=5
     @WebRest
     @URLMapping(value = "/sasa6/exam" , methode = "GET")
     public String FonctionExemple6(@Param("Objet1") MonObjet Objet1, @Param("param2") String[] param2){
         return Objet1.getNom() + " et " + param2[0];
     }
 
+    // /sasa7/exam?param1=5&param1=6&param2=Fafa&param2=Maka
     @WebRest
     @URLMapping(value = "/sasa7/exam" , methode = "GET")
     public String FonctionExemple7(@Param("param1") String[] param1, @Param("param2") String[] param2){
         return param1[0] + "et"+ param2[1];
     }
 
+    // /sasa3/exam?id_Objet1=1&nom_Objet1=Fafa&id_Objet2=2&nom_Objet2=Maka&NameHasard=Hasard
     @WebRest 
     @URLMapping(value = "/sasa3/exam" , methode = "GET")
     public String FonctionExemple3(@Param("Objet1") MonObjet Objet1, @Param("Objet2") MonObjet Objet2, @Param("NameHasard") String NameHasard){
@@ -65,4 +70,19 @@ public class exemple {
 public String FonctionMonObjetAppel(@Param("Objet1") MonObjet Objet1){
     return Objet1.getNom() + " et " + Objet1.getId();
 }
+
+    // http://localhost:8081/testFramework/Mia/exam?id_Objet1=1&nom_Objet1=Fafa&ex_Objet1=5&ex_Objet1=6&id_Objet2=2&nom_myObjet_Objet2=Fa&id_myObjet_Objet2=3
+    @WebRest 
+    @URLMapping(value = "/Mia/exam" , methode = "GET")
+    public String ExempleFonction(@Param("Objet1") MonObjet Objet1, @Param("Objet2") MonObjet2 Objet2){
+        return Objet1.getNom() + " et " + Objet2.getId() + "et "+Objet2.getMyObjet().getNom();
+    }
+
+    // http://localhost:8081/testFramework/Mia1/exam?id_Objet1=1&nom_Objet1=Fafa&ex_Objet1=5&ex_Objet1=6
+    @WebRest 
+    @URLMapping(value = "/Mia1/exam" , methode = "GET")
+    public String ExempleFonction1(@Param("Objet1") MonObjet Objet1){
+        return Objet1.getNom() + " et " + Objet1.getId() + " et " + Objet1.getEx()[0];
+    }
+
 }

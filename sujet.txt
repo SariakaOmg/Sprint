@@ -15,4 +15,18 @@ si le parametre est un tableau :
 Ampiana annotation table : 
 mbola ts mety :
 - tableau objet comme argument
-idee : ilay ObjetCOmplexe atao Map<string, Map<string, string[]>>
+idee : ilay ObjetCOmplexe atao Map<string, Map<string, string[]>> ObjetCOmplexeMap
+- ArrayList de objet simple , et arraylist d'objet complexe :
+
+Idee impossible:
+// - Objet dans un objet : 
+    - creer une fonction genererfonction(Class<?>, nomFonction, typedeeretour, argument(list), typeARguments(list))
+    - creer une fonction zanakYClass() : qui va prendre la classe de l attribut ayant de annotation ObjetDansObjet()
+Idee possible :
+transformer nom_a_p en o.p.a.nom , appeler la fonction par ca
+
+- Verifier si cette objet peut contenir de attribut en tab[] : ok
+idee : il faut qu'une fonction peut faire :
+MonObjet1 monobjet1.setNom_monObjet2(), pour se faire je vais creer une annotation : ObjetdansObjet, elle va permettre que la fonction setNom_monObjet2 sera creer automatiquement :
+
+Contrainte il faut que le nom du input de framework a le meme nom que le attribut :

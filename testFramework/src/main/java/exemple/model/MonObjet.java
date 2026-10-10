@@ -4,6 +4,13 @@ public class MonObjet {
 
     private int id;
     private String nom;
+    private int[] ex;
+
+    public MonObjet(int id, String nom, int[] ex) {
+        this.id = id;
+        this.nom = nom;
+        this.ex = ex;
+    }
 
     public MonObjet() {
     }
@@ -32,5 +39,13 @@ public class MonObjet {
     @Override
     public String toString() {
         return nom;
+    }
+
+    public int[] getEx() {
+        return ex;
+    }
+
+    public void setEx(int[] ex) {
+        this.ex = ex;
     }
 }

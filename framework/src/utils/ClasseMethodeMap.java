@@ -50,12 +50,19 @@ public class ClasseMethodeMap {
             String nomArgument = annotation != null ? annotation.value() : p.getName();
             Class<?> typeArgument = p.getType();       
             if (typeArgument.getName().startsWith("exemple.model.")){
-                Field[] fields = typeArgument.getDeclaredFields();
-                for (Field field : fields) {
-                    String nomAttribut = field.getName()+"_"+nomArgument;
-                    Class<?> typeAttribut = field.getType();
+                // Field[] fields = typeArgument.getDeclaredFields();
+                // for (Field field : fields) {
+                //     String nomAttribut = field.getName()+"_"+nomArgument;
+                //     Class<?> typeAttribut = field.getType();
+                //     Class<?>[] args = new Class[2];
+                //     args[0] = typeAttribut;
+                //     args[1] = typeArgument;
+                //     this.nomEtTyPeArg.put(nomAttribut, args);
+                // }
+                for (Map.Entry<String, Accesseur> e : RegistreAccesseurs.pour(typeArgument).entrySet()) {
+                    String nomAttribut = e.getKey() + "_" + nomArgument;
                     Class<?>[] args = new Class[2];
-                    args[0] = typeAttribut;
+                    args[0] = e.getValue().getType();
                     args[1] = typeArgument;
                     this.nomEtTyPeArg.put(nomAttribut, args);
                 }

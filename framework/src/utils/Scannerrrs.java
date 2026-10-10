@@ -1,15 +1,39 @@
 package utils;
-
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
+
+import main.java.FrontControllerServlet;
+
 import java.lang.reflect.Method;
 import mg.itu.*;
 public class Scannerrrs {
+    // public static  void ScannerObjetDansObjet(String ChemineSource, String packageController)throws Exception{
+    //     ArrayList<String> ListController = new ArrayList<>();
+    //     ListController = Scannerrrs.ScannerController(ChemineSource, packageController);
+    //     for (int index = 0; index < ListController.size(); index++) {
+    //         Class<?> kilasy = Class.forName(ListController.get(index));
+    //         //Field[] fields = kilasy.getDeclaredFields();
+    //         int i = 0;
+    //         Fields[] zanakaFieldsMisyAnnontation = ZanakYFields(kilasy);
+    //         while (i == 0) {
+    //             String nom_Fonction = zanakaFieldsMisyAnnontation[i].getNom()+kilasy.getSimpleName();
+    //             FrontControllerServlet.GenererFonctionGetters(kilasy, "get" + nom_Fonction, kilasy);
+    //             FrontControllerServlet.GenererFonctionSetters(kilasy, "set" + nom_Fonction, kilasy);
+    //             i++;
+    //             if( i == zanakaFieldsMisyAnnontation.length ){
+    //                 zanakaFieldsMisyAnnontation = ZanakYFields();
+    //                 i = 0;
+    //             }
+    //         }
+    //     }
+
+    // }
     public static ArrayList<String> ScannerController(String ChemineSource, String packageController){
         ArrayList<String> ListController = new ArrayList<>();
         String a = packageController.replace("/", ".");
