@@ -1,6 +1,6 @@
 package main.java;
 import jakarta.servlet.ServletException;
-import utils.ObjetC;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -9,17 +9,15 @@ import java.lang.reflect.Parameter;
 import java.nio.file.Files;
 import java.util.stream.Stream;
 import mg.itu.URLMapping;
-import utils.Scannerrrs;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import com.google.gson.Gson;
-import utils.Accesseur;
+
 import utils.*;
-import utils.ClasseMethodeMap;
-import utils.URLetMethodeHttps;
-import utils.Util;
-import utils.ModelView;
+import mg.itu.Param;
+
 import org.springframework.web.context.WebApplicationContext;
 public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     private Map<URLetMethodeHttps, ClasseMethodeMap> listeUrMap3 = new HashMap<>();
@@ -204,6 +202,15 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                     }
                 }
             });
+            // Noms avec indice, ex : nom_0_liste_Obj
+                parameterMap.forEach((nomUrl, valeursUrl) -> {
+                    if (nomUrl.matches(".*_\\d+_.*")) {
+                        Class<?>[] klas = parametermethode.get(Accesseur.sansIndices(nomUrl));
+                        if (klas != null && klas[0] != null && klas[1] != null) {
+                            ObjetCOmplexeMap.put(nomUrl, new ObjetC(klas[0].getName(), valeursUrl));
+                        }
+                    }
+                });
             Object[] argumentsPourAppel = new Object[temp.size()];
             for (int index = 0; index < temp.size(); index++) {
                 argumentsPourAppel[index] = temp.get(index);
@@ -278,8 +285,12 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                                 // Class<?> typeAttendu = method.getParameterTypes()[0];
                                 // Object ValeurConvertie = convertirArgument(entry.getValue(), typeAttendu);
                                 // method.invoke(b, ValeurConvertie);
-                                Accesseur acc = RegistreAccesseurs.pour(typeParametre).get(entry.getKey());
-                                acc.set(b, entry.getValue());
+                                // Accesseur acc = RegistreAccesseurs.pour(typeParametre).get(entry.getKey());
+                                // acc.set(b, entry.getValue());
+                                Accesseur acc = RegistreAccesseurs.pour(typeParametre).get(Accesseur.sansIndices(entry.getKey()));
+                                    if (acc != null) {
+                                        acc.set(b, entry.getValue(), Accesseur.indices(entry.getKey()));
+                                    }
                             }
                             if(indice != -1)
                             {finalE.put(indice, b);}

@@ -1,12 +1,12 @@
 package exemple.model;
-
+import java.util.ArrayList;
 public class MonObjet {
 
     private int id;
     private String nom;
-    private int[] ex;
+    private ArrayList<Integer> ex;
 
-    public MonObjet(int id, String nom, int[] ex) {
+    public MonObjet(int id, String nom, ArrayList<Integer> ex) {
         this.id = id;
         this.nom = nom;
         this.ex = ex;
@@ -41,11 +41,11 @@ public class MonObjet {
         return nom;
     }
 
-    public int[] getEx() {
+    public ArrayList<Integer> getEx() {
         return ex;
     }
 
-    public void setEx(int[] ex) {
+    public void setEx(ArrayList<Integer> ex) {
         this.ex = ex;
     }
 }

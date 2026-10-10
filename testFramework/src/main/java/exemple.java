@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import exemple.model.MonObjet;
 import exemple.model.MonObjet2;
+import exemple.model.MonObjet3;
 @Controller
 public class exemple {
 
@@ -82,7 +83,14 @@ public String FonctionMonObjetAppel(@Param("Objet1") MonObjet Objet1){
     @WebRest 
     @URLMapping(value = "/Mia1/exam" , methode = "GET")
     public String ExempleFonction1(@Param("Objet1") MonObjet Objet1){
-        return Objet1.getNom() + " et " + Objet1.getId() + " et " + Objet1.getEx()[0];
+        return Objet1.getNom() + " et " + Objet1.getId() + " et " + Objet1.getEx().get(0);
+    }
+
+    // http://localhost:8081/testFramework/Mia2/exam?id_0_list1_Objet1=1&nom_0_list1_Objet1=Fafa&id_0_list2_Objet1=2&nom_0_list2_Objet1=Maka
+    @WebRest 
+    @URLMapping(value = "/Mia2/exam" , methode = "GET")
+    public String ExempleFonction2(@Param("Objet1") MonObjet3 Objet1){
+        return Objet1.getList1().get(0).getNom() + " et " + Objet1.getList2()[0].getId();
     }
 
 }

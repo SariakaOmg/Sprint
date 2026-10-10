@@ -18,8 +18,8 @@ mbola ts mety :
 idee : ilay ObjetCOmplexe atao Map<string, Map<string, string[]>> ObjetCOmplexeMap
 - ArrayList de objet simple , et arraylist d'objet complexe :
 
-Idee impossible:
-// - Objet dans un objet : 
+- Objet dans un objet : ok
+Idee impossible: 
     - creer une fonction genererfonction(Class<?>, nomFonction, typedeeretour, argument(list), typeARguments(list))
     - creer une fonction zanakYClass() : qui va prendre la classe de l attribut ayant de annotation ObjetDansObjet()
 Idee possible :
@@ -29,4 +29,39 @@ transformer nom_a_p en o.p.a.nom , appeler la fonction par ca
 idee : il faut qu'une fonction peut faire :
 MonObjet1 monobjet1.setNom_monObjet2(), pour se faire je vais creer une annotation : ObjetdansObjet, elle va permettre que la fonction setNom_monObjet2 sera creer automatiquement :
 
+mbola tsy mety :
+- argument fonction tableau Objet :
+- si l attribut est un tableau ou arraylist de objet complexe : ok 
+
 Contrainte il faut que le nom du input de framework a le meme nom que le attribut :
+
+## En résumé
+
+**Le but :** quand l'URL contient `nom_myObjet_Objet2=Fafa`, ranger `Fafa` dans `Objet2.myObjet.nom`.
+
+**Deux classes :**
+
+| Classe | Rôle | Image |
+|---|---|---|
+| `RegistreAccesseurs` | Prépare la liste de tous les chemins possibles d'une classe | le plan |
+| `Accesseur` | Suit un chemin et dépose la valeur au bout | le livreur |
+
+**`RegistreAccesseurs`**
+- Il parcourt les attributs de la classe.
+- Attribut avec `@ObjetDansObjet` : il descend dedans.
+- Attribut simple : il l'enregistre avec son chemin.
+- Le nom est écrit à l'envers : `[myObjet, nom]` donne `nom_myObjet`.
+
+**`Accesseur`**
+- Il suit le chemin dans l'objet.
+- Si un objet au milieu est vide, il le crée.
+- Il convertit le texte de l'URL dans le bon type (`"5"` devient `5`, ou `[5, 6]` pour un tableau).
+
+**Dans le servlet**, ces deux lignes font tout :
+
+```java
+Accesseur acc = RegistreAccesseurs.pour(typeParametre).get(entry.getKey());
+acc.set(b, entry.getValue());
+```
+
+Ça veut dire : « trouve le chemin qui correspond au nom de l'URL, puis dépose la valeur dedans ».

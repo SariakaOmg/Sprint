@@ -34,7 +34,7 @@ public class RegistreAccesseurs {
             List<Field> chemin = new ArrayList<>(prefixe);
             chemin.add(f);
             if (f.isAnnotationPresent(ObjetDansObjet.class)) {
-                explorer(f.getType(), chemin, out, profondeur + 1); // on descend dans l'objet
+                explorer(Accesseur.typeCible(f), chemin, out, profondeur + 1); // on descend (dans l'élément si c'est une liste/tableau)
             } else {
                 out.put(cle(chemin), new Accesseur(chemin.toArray(new Field[0])));
             }
