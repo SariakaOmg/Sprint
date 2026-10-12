@@ -3,6 +3,7 @@ import mg.itu.Param;
 import mg.itu.URLMapping;
 import mg.itu.WebRest;
 import utils.ModelView;
+import utils.MapFile;
 import mg.itu.Param;
 
 import java.util.ArrayList;
@@ -12,6 +13,8 @@ import exemple.model.MonObjet2;
 import exemple.model.MonObjet3;
 @Controller
 public class exemple {
+
+
 
     @URLMapping(value = "/showForm", methode = "GET")
     public ModelView showForm() {
@@ -93,4 +96,20 @@ public String FonctionMonObjetAppel(@Param("Objet1") MonObjet Objet1){
         return Objet1.getList1().get(0).getNom() + " et " + Objet1.getList2()[0].getId();
     }
 
+    @WebRest 
+    @URLMapping(value = "/Mae/exam" , methode = "GET")
+    public String ExempleFonction2(@Param("Objet1") MapFile Objet1){
+        return Objet1.getNomFichier() + " et " + Objet1.getExtension();
+    }
+
+    @WebRest 
+    @URLMapping(value = "/Mae2/exam" , methode = "GET")
+    public String ExempleFonction2(@Param("Objet1") MapFile Objet1, @Param("Objet2") String Objet2){
+        return Objet1.getNomFichier() + " et " + Objet1.getExtension() + " et " + Objet2;
+    }
+
+    @URLMapping(value = "/", methode = "GET")
+    public ModelView formUpload() {
+        return new ModelView("formulaireUpload", null);
+    }
 }
