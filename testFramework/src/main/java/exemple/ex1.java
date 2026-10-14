@@ -27,7 +27,6 @@ public class ex1 {
         return a;
     }
 
-    
     @URLMapping(value="/sasa1", methode = "GET")
     public ModelView methode2(){
         ArrayList<String> fruitss = new ArrayList<>();

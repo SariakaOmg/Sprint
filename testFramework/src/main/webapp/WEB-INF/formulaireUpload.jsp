@@ -15,7 +15,7 @@
     </style>
 </head>
 <body>
-    <form action="Mae/exam" method="get" enctype="multipart/form-data">
+    <form action="Mae/exam" method="post" enctype="multipart/form-data">
         <h2>Uploader un fichier</h2>
 
         <label for="fichier">Choisir un fichier :</label>
