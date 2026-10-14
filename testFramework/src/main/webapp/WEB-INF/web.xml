@@ -37,6 +37,10 @@ version="2.4">
         <param-name>CheminClasses</param-name>
         <param-value>/WEB-INF/classes</param-value>
     </init-param>
+    <init-param>
+        <param-name>CheminUpload</param-name>
+        <param-value></param-value>
+    </init-param>
     <multipart-config>
         <max-file-size>10485760</max-file-size>        <!-- 10 Mo par fichier -->
         <max-request-size>20971520</max-request-size>  <!-- 20 Mo par requête -->

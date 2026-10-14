@@ -30,6 +30,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     private WebApplicationContext springContext;
     private String packView;
     private String extensionView;
+    private String CheminUpload;
  
     public void init() throws ServletException {
         // Étape A : Récupérer la valeur déclarée dans le web.xml ("/WEB-INF/classes/")
@@ -45,6 +46,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
         }
         this.packView = getInitParameter("PackView") != null ? getInitParameter("PackView") : "/WEB-INF/";
         this.extensionView = getInitParameter("ExtensionView") != null ? getInitParameter("ExtensionView") : "jsp";
+        this.CheminUpload = getInitParameter("CheminUpload") != null ? getInitParameter("CheminUpload") : "";
         try {
             ArrayList<ArrayList<String>> scanResultMap = Scannerrrs.ScannerURLMapping(chemine, packageContr);
            // Scannerrrs.ScannerObjetDansObjet(chemine, packageContr);
@@ -443,7 +445,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
         } else {
             this.Output(request, response);
         }
-        String dest = "/home/sariaka/s5/Sprint-8/";
+        String dest = this.CheminUpload;
         if (!fichiersUploades.isEmpty() && fichiersUploades != null){
             for (Map.Entry<String, MapFile> entry : fichiersUploades.entrySet()) {
                 MapFile mapfile = entry.getValue();
