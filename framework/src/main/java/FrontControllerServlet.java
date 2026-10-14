@@ -4,6 +4,7 @@ import jakarta.servlet.http.Part;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -387,6 +388,39 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     }
     return fichiers;
     }
+    protected String EnregistrerFichier(MapFile mf, String Destination){
+        // return Objet1.getNomFichier() + " et " + Objet1.getExtension();
+       if (mf == null || mf.getContenu() == null) {
+        return "Erreur : Aucun fichier reçu ou fichier vide.";
+        }
+
+    try {
+        // 1. Définir le dossier de destination sur le serveur
+        // (Exemple : un dossier "uploads" à la racine de votre application ou un chemin absolu)
+        String dossierDestination = Destination; // ou "/var/www/uploads/" sur Linux
+        
+        // S'assurer que le dossier existe, sinon le créer
+        File repertoire = new File(dossierDestination);
+        if (!repertoire.exists()) {
+            repertoire.mkdirs();
+        }
+
+        // 2. Construire le chemin complet du fichier final
+        String cheminFichierFinal = dossierDestination + mf.getNomFichier();
+        Path cheminCible = Paths.get(cheminFichierFinal);
+
+        // 3. Écrire le tableau de bytes dans le fichier de destination
+        Files.write(cheminCible, mf.getContenu());
+
+        // 4. Retourner un message de succès
+        return "Fichier enregistré avec succès : " + mf.getNomFichier() 
+               + " (" + mf.getExtension() + ")";
+        
+    } catch (IOException e) {
+        e.printStackTrace();
+        return "Erreur lors de la sauvegarde du fichier : " + e.getMessage();
+    }
+    }
 
     protected void executeFonction(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws jakarta.servlet.ServletException, java.io.IOException{
         response.setContentType("text/html;charset=UTF-8");
@@ -408,6 +442,13 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
             this.OutPutJson(request, response);
         } else {
             this.Output(request, response);
+        }
+        String dest = "/home/sariaka/s5/Sprint-8/";
+        if (!fichiersUploades.isEmpty() && fichiersUploades != null){
+            for (Map.Entry<String, MapFile> entry : fichiersUploades.entrySet()) {
+                MapFile mapfile = entry.getValue();
+                EnregistrerFichier(mapfile, dest);
+            }
         }
     }
  
