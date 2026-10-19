@@ -1,20 +1,25 @@
 package main.java;
 import jakarta.servlet.ServletException;
-
+import jakarta.servlet.http.Part;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.nio.file.Files;
 import java.util.stream.Stream;
 import mg.itu.URLMapping;
-
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import com.google.gson.Gson;
-
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.io.InputStream;
 import utils.*;
 import mg.itu.Param;
 
@@ -25,6 +30,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     private WebApplicationContext springContext;
     private String packView;
     private String extensionView;
+    private String CheminUpload;
  
     public void init() throws ServletException {
         // Étape A : Récupérer la valeur déclarée dans le web.xml ("/WEB-INF/classes/")
@@ -40,6 +46,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
         }
         this.packView = getInitParameter("PackView") != null ? getInitParameter("PackView") : "/WEB-INF/";
         this.extensionView = getInitParameter("ExtensionView") != null ? getInitParameter("ExtensionView") : "jsp";
+        this.CheminUpload = getInitParameter("CheminUpload") != null ? getInitParameter("CheminUpload") : "";
         try {
             ArrayList<ArrayList<String>> scanResultMap = Scannerrrs.ScannerURLMapping(chemine, packageContr);
            // Scannerrrs.ScannerObjetDansObjet(chemine, packageContr);
@@ -150,7 +157,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     return null;
 }
     //maka donnee by url
-    protected void TakeDonneByUrl(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, Map<URLetMethodeHttps, ClasseMethodeMap> listeFiltree){
+    protected void TakeDonneByUrl(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, Map<URLetMethodeHttps, ClasseMethodeMap> listeFiltree, Map<String, MapFile> mp){
         listeFiltree.forEach((url, classeMethode) -> {
             Map<String, String[]> parameterMap = request.getParameterMap();
             Map<String, String[]> parametresFiltrees = new HashMap<>();
@@ -182,6 +189,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                 String[] value = parameterMap.get(nom);
                 if (value == null) return;
                 if (klas != null){
+                    if (klas != null && klas[0] == MapFile.class) return;
                     if (klas[0] != null && klas[1] == null){
                         Object arg = convertirArgument(value, klas[0]);
                         temp.add(arg);
@@ -230,10 +238,15 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                     } else {
                         Parameter[] p = m.getParameters();
                         Map<Integer, Object> finalE = new HashMap<>();
+                        Set<Integer> positionsFichiers = new HashSet<>();
                         for (int index = 0; index < p.length; index++) {
                             String nomParametre = p[index].getName();
                             Class<?> typeParametre = p[index].getType();
-                            if(typeParametre.getPackageName().equals("exemple.model")){
+                            if (typeParametre == MapFile.class){
+                                finalE.put(index, mp.get(nomParametre));
+                                positionsFichiers.add(index);
+                            }
+                            else if(typeParametre.getPackageName().equals("exemple.model")){
                             Map<String, String[]> pc = new HashMap<>();
                             int indice = -1;
                             int indice2 = -1;
@@ -256,37 +269,10 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                                     indice = index;
                                 }
                             }
-                            //////////////
-                            // for (Map.Entry<String, String[]> entry : ObjectCOmplexe.entrySet()) {
-                            //     String nomComplexe = entry.getKey();
-                            //     int lastIndex = nomComplexe.lastIndexOf("_");
-
-                            //         String AvantNomComplexe = nomComplexe;
-                            //         String apreNomComplexe = "";
-
-                            //     if (lastIndex != -1) {
-                            //         AvantNomComplexe = nomComplexe.substring(0, lastIndex);
-                            //         apreNomComplexe = nomComplexe.substring(lastIndex + 1);
-                            //     } 
-                                    
-                            //     //String apreNomComplexe = nomComplexe.substring(nomComplexe.indexOf("_") + 1);
-                            //     //String AvantNomComplexe = nomComplexe.substring(0, nomComplexe.indexOf("_"));
-                            //     String[] valeurComplexe = entry.getValue();
-                            //     if (nomParametre.equals(apreNomComplexe) && apreNomComplexe != null && AvantNomComplexe != null) {
-                            //         //pc.put(AvantNomComplexe, valeurComplexe);
-                            //         pc.put(AvantNomComplexe, valeurComplexe[1]);
-                            //         indice = index;
-                            //     }
-                            // }
-                            ///
+                            
                             Object b = typeParametre.getDeclaredConstructor().newInstance();
                             for (Map.Entry<String, String[]> entry : pc.entrySet()) {
-                                // Method method = trouverSetter(typeParametre, "set" + entry.getKey());
-                                // Class<?> typeAttendu = method.getParameterTypes()[0];
-                                // Object ValeurConvertie = convertirArgument(entry.getValue(), typeAttendu);
-                                // method.invoke(b, ValeurConvertie);
-                                // Accesseur acc = RegistreAccesseurs.pour(typeParametre).get(entry.getKey());
-                                // acc.set(b, entry.getValue());
+                               
                                 Accesseur acc = RegistreAccesseurs.pour(typeParametre).get(Accesseur.sansIndices(entry.getKey()));
                                     if (acc != null) {
                                         acc.set(b, entry.getValue(), Accesseur.indices(entry.getKey()));
@@ -306,7 +292,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                         
                         int j = 0;
                         for (int i = 0; i < args.length; i++) {
-                            if (args[i] == null && j < argumentsPourAppel.length) {
+                            if (args[i] == null && !positionsFichiers.contains(i) && j < argumentsPourAppel.length) {
                                 args[i] = argumentsPourAppel[j++];
                             }
                         }
@@ -346,6 +332,8 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                 }
         });
     }
+
+    
     //filtrer by url
     protected Map<URLetMethodeHttps, ClasseMethodeMap> FiltrerByUrl(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response)throws java.io.IOException{
         String url = request.getRequestURI();
@@ -376,16 +364,76 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
         return liste;
     }
 
-    
+
+    private Map<String, MapFile> extraireFichiers(jakarta.servlet.http.HttpServletRequest request)
+        throws java.io.IOException, jakarta.servlet.ServletException {
+
+    Map<String, MapFile> fichiers = new HashMap<>();
+
+    String ct = request.getContentType();
+    if (ct != null && ct.toLowerCase().startsWith("multipart/")) {
+        for (Part part : request.getParts()) {
+            // getSubmittedFileName() != null  =>  c'est un fichier (sinon champ texte)
+            if (part.getSubmittedFileName() != null && part.getSize() > 0) {
+                MapFile mapFile = new MapFile();
+                mapFile.setNomFichier(part.getSubmittedFileName());
+                mapFile.setExtension(part.getContentType());
+                try (InputStream inputStream = part.getInputStream()) {
+                    byte[] fileBytes = inputStream.readAllBytes();
+                    mapFile.setContenu(fileBytes);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                fichiers.put(part.getName(), mapFile);   // clé = name="fichier" du formulaire
+            }
+        }
+    }
+    return fichiers;
+    }
+    protected String EnregistrerFichier(MapFile mf, String Destination){
+        // return Objet1.getNomFichier() + " et " + Objet1.getExtension();
+       if (mf == null || mf.getContenu() == null) {
+        return "Erreur : Aucun fichier reçu ou fichier vide.";
+        }
+
+    try {
+        // 1. Définir le dossier de destination sur le serveur
+        // (Exemple : un dossier "uploads" à la racine de votre application ou un chemin absolu)
+        String dossierDestination = Destination; // ou "/var/www/uploads/" sur Linux
+        
+        // S'assurer que le dossier existe, sinon le créer
+        File repertoire = new File(dossierDestination);
+        if (!repertoire.exists()) {
+            repertoire.mkdirs();
+        }
+
+        // 2. Construire le chemin complet du fichier final
+        String cheminFichierFinal = dossierDestination + mf.getNomFichier();
+        Path cheminCible = Paths.get(cheminFichierFinal);
+
+        // 3. Écrire le tableau de bytes dans le fichier de destination
+        Files.write(cheminCible, mf.getContenu());
+
+        // 4. Retourner un message de succès
+        return "Fichier enregistré avec succès : " + mf.getNomFichier() 
+               + " (" + mf.getExtension() + ")";
+        
+    } catch (IOException e) {
+        e.printStackTrace();
+        return "Erreur lors de la sauvegarde du fichier : " + e.getMessage();
+    }
+    }
+
     protected void executeFonction(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws jakarta.servlet.ServletException, java.io.IOException{
         response.setContentType("text/html;charset=UTF-8");
         Map<URLetMethodeHttps, ClasseMethodeMap> listeFiltree = this.FiltrerByUrl(request, response);
+        Map<String, MapFile> fichiersUploades = this.extraireFichiers(request);
         if (request.getDispatcherType() == jakarta.servlet.DispatcherType.FORWARD) {
             request.getServletContext().getNamedDispatcher("jsp").forward(request, response);
             return;
         }
         if (!listeFiltree.isEmpty()) {
-            this.TakeDonneByUrl(request, response, listeFiltree);
+            this.TakeDonneByUrl(request, response, listeFiltree, fichiersUploades);
         }
         String vueForward = (String) request.getAttribute("vueForward");
         if (vueForward != null) {
@@ -396,6 +444,13 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
             this.OutPutJson(request, response);
         } else {
             this.Output(request, response);
+        }
+        String dest = this.CheminUpload;
+        if (!fichiersUploades.isEmpty() && fichiersUploades != null){
+            for (Map.Entry<String, MapFile> entry : fichiersUploades.entrySet()) {
+                MapFile mapfile = entry.getValue();
+                EnregistrerFichier(mapfile, dest);
+            }
         }
     }
  

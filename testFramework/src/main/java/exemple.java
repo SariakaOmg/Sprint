@@ -3,8 +3,14 @@ import mg.itu.Param;
 import mg.itu.URLMapping;
 import mg.itu.WebRest;
 import utils.ModelView;
+import utils.MapFile;
 import mg.itu.Param;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import exemple.model.MonObjet;
@@ -12,6 +18,8 @@ import exemple.model.MonObjet2;
 import exemple.model.MonObjet3;
 @Controller
 public class exemple {
+
+
 
     @URLMapping(value = "/showForm", methode = "GET")
     public ModelView showForm() {
@@ -86,11 +94,62 @@ public String FonctionMonObjetAppel(@Param("Objet1") MonObjet Objet1){
         return Objet1.getNom() + " et " + Objet1.getId() + " et " + Objet1.getEx().get(0);
     }
 
-    // http://localhost:8081/testFramework/Mia2/exam?id_0_list1_Objet1=1&nom_0_list1_Objet1=Fafa&id_0_list2_Objet1=2&nom_0_list2_Objet1=Maka
+    // http://localhost:8081/testFramework/Mia2/examPOST?id_0_list1_Objet1=1&nom_0_list1_Objet1=Fafa&id_0_list2_Objet1=2&nom_0_list2_Objet1=Maka
     @WebRest 
     @URLMapping(value = "/Mia2/exam" , methode = "GET")
     public String ExempleFonction2(@Param("Objet1") MonObjet3 Objet1){
         return Objet1.getList1().get(0).getNom() + " et " + Objet1.getList2()[0].getId();
     }
 
+    @WebRest 
+    @URLMapping(value = "/Mae/exam" , methode = "POST")
+    public String ExempleFonction3(@Param("Objet1") MapFile Objet1){
+       // return Objet1.getNomFichier() + " et " + Objet1.getExtension();
+       if (Objet1 == null || Objet1.getContenu() == null) {
+        return "Erreur : Aucun fichier reçu ou fichier vide.";
+        }
+
+    try {
+        // 1. Définir le dossier de destination sur le serveur
+        // (Exemple : un dossier "uploads" à la racine de votre application ou un chemin absolu)
+        String dossierDestination = "/home/sariaka/"; // ou "/var/www/uploads/" sur Linux
+        
+        // S'assurer que le dossier existe, sinon le créer
+        File repertoire = new File(dossierDestination);
+        if (!repertoire.exists()) {
+            repertoire.mkdirs();
+        }
+
+        // 2. Construire le chemin complet du fichier final
+        String cheminFichierFinal = dossierDestination + Objet1.getNomFichier();
+        Path cheminCible = Paths.get(cheminFichierFinal);
+
+        // 3. Écrire le tableau de bytes dans le fichier de destination
+        Files.write(cheminCible, Objet1.getContenu());
+
+        // 4. Retourner un message de succès
+        return "Fichier enregistré avec succès : " + Objet1.getNomFichier() 
+               + " (" + Objet1.getExtension() + ")";
+        
+    } catch (IOException e) {
+        e.printStackTrace();
+        return "Erreur lors de la sauvegarde du fichier : " + e.getMessage();
+    }
+    }
+
+    @WebRest 
+    @URLMapping(value = "/Mae2/exam" , methode = "POST")
+    public String ExempleFonction2(@Param("Objet1") MapFile Objet1, @Param("Objet2") String Objet2){
+        return Objet1.getNomFichier() + " et " + Objet1.getExtension() + " et " + Objet2;
+    }
+
+    @URLMapping(value = "/", methode = "GET")
+    public ModelView formUpload() {
+        return new ModelView("formulaireUpload", null);
+    }
+
+    @URLMapping(value = "/2", methode = "GET")
+    public ModelView formUpload2() {
+        return new ModelView("formulaireUploadAvecString", null);
+    }
 }
