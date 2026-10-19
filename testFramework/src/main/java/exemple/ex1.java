@@ -19,6 +19,7 @@ import exemple.service.MonObjetService;
 
 @Controller
 public class ex1 {
+    @WebRest
     @URLMapping(value="/sasa2", methode = "GET")
     public String fonctionExemple(){
         // System.out.println("OK11");
@@ -26,6 +27,7 @@ public class ex1 {
         return a;
     }
 
+    
     @URLMapping(value="/sasa1", methode = "GET")
     public ModelView methode2(){
         ArrayList<String> fruitss = new ArrayList<>();

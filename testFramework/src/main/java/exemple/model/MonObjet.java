@@ -1,9 +1,16 @@
 package exemple.model;
-
+import java.util.ArrayList;
 public class MonObjet {
 
     private int id;
     private String nom;
+    private ArrayList<Integer> ex;
+
+    public MonObjet(int id, String nom, ArrayList<Integer> ex) {
+        this.id = id;
+        this.nom = nom;
+        this.ex = ex;
+    }
 
     public MonObjet() {
     }
@@ -32,5 +39,13 @@ public class MonObjet {
     @Override
     public String toString() {
         return nom;
+    }
+
+    public ArrayList<Integer> getEx() {
+        return ex;
+    }
+
+    public void setEx(ArrayList<Integer> ex) {
+        this.ex = ex;
     }
 }
