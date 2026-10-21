@@ -6,7 +6,6 @@ import utils.ModelView;
 import utils.MySession;
 import utils.MapFile;
 import mg.itu.Param;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,6 +17,7 @@ import exemple.model.MonObjet;
 import exemple.model.MonObjet2;
 import exemple.model.MonObjet3;
 @Controller
+
 public class exemple {
 
     @URLMapping(url = "traitement-login", methode = "POST")

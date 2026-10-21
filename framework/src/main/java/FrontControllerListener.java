@@ -39,7 +39,7 @@ public class FrontControllerListener implements ServletContextListener {
 
                 // Vérifier si la classe possède l'annotation @Singleton
                 // (Assurez-vous d'avoir créé l'annotation @Singleton dans mg.itu)
-                if (clazz.isAnnotationPresent(mg.itu.Singleton.class)) {
+                if (clazz.isAnnotationPresent(mg.itu.Controller.class)) {
                     // Instanciation unique au démarrage du serveur
                     Object instance = clazz.getDeclaredConstructor().newInstance();
                     singletonsMap.put(clazz.getName(), instance);
