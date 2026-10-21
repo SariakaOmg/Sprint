@@ -21,6 +21,14 @@ version="2.4">
 <servlet>
     <servlet-name>FrontController</servlet-name>
     <servlet-class>main.java.FrontControllerServlet</servlet-class>
+    <context-param>
+    <param-name>PackCon</param-name>
+    <param-value>exemple</param-value>
+    </context-param>
+    <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>/WEB-INF/applicationContext.xml</param-value>
+    </context-param>
     <init-param>
         <param-name>PackCon</param-name>
         <param-value></param-value>

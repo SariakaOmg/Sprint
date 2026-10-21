@@ -3,6 +3,7 @@ import mg.itu.Param;
 import mg.itu.URLMapping;
 import mg.itu.WebRest;
 import utils.ModelView;
+import utils.MySession;
 import utils.MapFile;
 import mg.itu.Param;
 
@@ -19,7 +20,27 @@ import exemple.model.MonObjet3;
 @Controller
 public class exemple {
 
+    @URLMapping(url = "traitement-login", methode = "POST")
+    public ModelView login(MySession session) {
+        // Supposons que l'utilisateur s'est connecté avec succès
+        String nomUtilisateur = "Sariaka";
 
+        // === POUR METTRE UNE VALEUR DANS LA SESSION ===
+        session.set("userConnecte", nomUtilisateur);
+        session.set("role", "Admin");
+
+        ModelView mv = new ModelView("profil");
+        return mv;
+    }
+
+    @URLMapping(url = "profil", methode = "GET")
+    public ModelView monProfil(MySession session) {
+        // Plus besoin de request.getSession() !
+        Object user = session.get("userConnecte");
+        ModelView mv = new ModelView("profil");
+        mv.addObject("utilisateur", user);
+        return mv;
+    }
 
     @URLMapping(value = "/showForm", methode = "GET")
     public ModelView showForm() {

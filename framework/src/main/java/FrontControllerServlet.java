@@ -225,8 +225,24 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
             }
                 Object result = null;
                 try {
-                    Object instance = classeMethode.isStaticite() ? null : kl.getDeclaredConstructor().newInstance();
 
+                    //////////////////////////////GEMINI///////////////////////////////////
+                    //Object instance = classeMethode.isStaticite() ? null : kl.getDeclaredConstructor().newInstance();
+                    Object instance = null;
+                    if (!classeMethode.isStaticite()) {
+                        // 1. Récupérer la map des singletons depuis le ServletContext
+                        Map<String, Object> singletonsMap = (Map<String, Object>) getServletContext().getAttribute("singletonsControllers");
+
+                        // 2. Vérifier si cette classe est un singleton enregistré
+                        if (singletonsMap != null && singletonsMap.containsKey(kl.getName())) {
+                            // On récupère l'unique instance déjà créée au démarrage
+                            instance = singletonsMap.get(kl.getName());
+                        } else {
+                            // Sinon, c'est un prototype : on instancie un nouvel objet pour cette requête
+                            instance = kl.getDeclaredConstructor().newInstance();
+                        }
+                    }
+                    ////////////////////////////////////////////////////////////////
                     if (Util.haveParameter(m, WebApplicationContext.class)) {
                         if (this.springContext == null) {
                             throw new Exception("Pas de springContext disponible");
@@ -242,7 +258,36 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                         for (int index = 0; index < p.length; index++) {
                             String nomParametre = p[index].getName();
                             Class<?> typeParametre = p[index].getType();
-                            if (typeParametre == MapFile.class){
+                            //////////////////////////////////////////GEMINI////////////////////////////////////////////////////
+                            // --- GESTION DE MySession --- //
+                            if (typeParametre == utils.MySession.class) {
+                                jakarta.servlet.http.HttpSession httpSession = request.getSession();
+                                
+                                // 1. Vérifier si l'objet MySession existe déjà dans la HttpSession de Java
+                                utils.MySession mySession = (utils.MySession) httpSession.getAttribute("myCustomSession");
+                                
+                                if (mySession == null) {
+                                    // S'il n'existe pas, on le crée avec l'ID de la session Java
+                                    mySession = new utils.MySession(httpSession.getId());
+                                    httpSession.setAttribute("myCustomSession", mySession);
+                                }
+                                
+                                // 2. Stockage global dans le ServletContext (Map globale id -> MySession)
+                                jakarta.servlet.ServletContext context = getServletContext();
+                                Map<String, utils.MySession> globalSessionsMap = (Map<String, utils.MySession>) context.getAttribute("globalSessionsMap");
+                                
+                                if (globalSessionsMap == null) {
+                                    globalSessionsMap = new HashMap<>();
+                                    context.setAttribute("globalSessionsMap", globalSessionsMap);
+                                }
+                                // On associe l'ID de session au MySession
+                                globalSessionsMap.put(httpSession.getId(), mySession);
+                            
+                                // 3. On l'ajoute aux arguments injectés pour la méthode du contrôleur
+                                finalE.put(index, mySession);
+                            }
+                            ///////////////////////////////////////////////////////////////////////////////////////////////////////
+                            else if (typeParametre == MapFile.class){
                                 finalE.put(index, mp.get(nomParametre));
                                 positionsFichiers.add(index);
                             }
