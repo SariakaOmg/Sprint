@@ -20,26 +20,20 @@ import exemple.model.MonObjet3;
 
 public class exemple {
 
-    @URLMapping(url = "traitement-login", methode = "POST")
-    public ModelView login(MySession session) {
+    @URLMapping(value="/traitement-login", methode = "GET")
+    public void login(MySession session) {
         // Supposons que l'utilisateur s'est connecté avec succès
         String nomUtilisateur = "Sariaka";
 
         // === POUR METTRE UNE VALEUR DANS LA SESSION ===
         session.set("userConnecte", nomUtilisateur);
         session.set("role", "Admin");
-
-        ModelView mv = new ModelView("profil");
-        return mv;
     }
 
-    @URLMapping(url = "profil", methode = "GET")
-    public ModelView monProfil(MySession session) {
+    @URLMapping(value = "/profil", methode = "GET")
+    public String monProfil(MySession session) {
         // Plus besoin de request.getSession() !
-        Object user = session.get("userConnecte");
-        ModelView mv = new ModelView("profil");
-        mv.addObject("utilisateur", user);
-        return mv;
+        return "session :"+session.get("userConnecte")+"";
     }
 
     @URLMapping(value = "/showForm", methode = "GET")
