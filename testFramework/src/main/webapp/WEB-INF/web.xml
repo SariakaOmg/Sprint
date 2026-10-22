@@ -49,6 +49,10 @@ version="2.4">
         <param-name>CheminUpload</param-name>
         <param-value></param-value>
     </init-param>
+    <init-param>
+        <param-name>AuthSessionKey</param-name>
+        <param-value>userConnecte</param-value> <!-- La clé qu'on cherchera dans la session -->
+    </init-param>
     <multipart-config>
         <max-file-size>10485760</max-file-size>        <!-- 10 Mo par fichier -->
         <max-request-size>20971520</max-request-size>  <!-- 20 Mo par requête -->

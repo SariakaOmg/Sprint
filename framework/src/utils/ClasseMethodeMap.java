@@ -14,6 +14,7 @@ public class ClasseMethodeMap {
     Map<String, Class<?>[]> nomEtTyPeArg = new LinkedHashMap<>();
     boolean Staticite;
     boolean WebRest;
+    boolean AuthCOnnect;
 
 
     public Class<?> getKilasy() {
@@ -100,5 +101,11 @@ public class ClasseMethodeMap {
     }
     public void setWebRest(boolean webRest) {
         WebRest = webRest;
+    }
+    public void setAuthCOnnect(boolean AuthCOnnecte){
+        this.AuthCOnnect = AuthCOnnecte;
+    }
+    public boolean isAuthCOnnect(){
+        return this.AuthCOnnect;
     }
 }

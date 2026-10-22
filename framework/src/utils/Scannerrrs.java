@@ -80,13 +80,21 @@ public class Scannerrrs {
                     URLMapping um = method[i].getAnnotation(mg.itu.URLMapping.class);
                     listePresentMapping1.add(um.value());//URL
                     listePresentMapping1.add(um.methode());
-                    listePresentMapping.add(listePresentMapping1);
 
                     if (method[i].isAnnotationPresent(mg.itu.WebRest.class)) {
                         listePresentMapping1.add("true");
                     } else {
                         listePresentMapping1.add("false");
                     }
+
+                    if (method[i].isAnnotationPresent(mg.itu.AuthentifiedMethod.class)) {
+                        listePresentMapping1.add("true");
+                    } else {
+                        listePresentMapping1.add("false");
+                    }   
+
+                    listePresentMapping.add(listePresentMapping1);
+
                 }
             }
         }
@@ -100,6 +108,7 @@ public class Scannerrrs {
                cm.setKilasy(Class.forName(listePresentMapping.get(index).get(0)));
                cm.setNomMethode(listePresentMapping.get(index).get(1));
                cm.setWebRest(Boolean.parseBoolean(listePresentMapping.get(index).get(4)));
+               cm.setAuthCOnnect(Boolean.parseBoolean(listePresentMapping.get(index).get(5)));
                cm.CompletMethods();
                URLetMethodeHttps urLetMethodeHttps = new URLetMethodeHttps();
                urLetMethodeHttps.setMethode(listePresentMapping.get(index).get(3));

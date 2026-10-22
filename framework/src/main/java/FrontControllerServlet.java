@@ -31,6 +31,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     private String packView;
     private String extensionView;
     private String CheminUpload;
+    private String authSessionKey;
  
     public void init() throws ServletException {
         // Étape A : Récupérer la valeur déclarée dans le web.xml ("/WEB-INF/classes/")
@@ -47,6 +48,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
         this.packView = getInitParameter("PackView") != null ? getInitParameter("PackView") : "/WEB-INF/";
         this.extensionView = getInitParameter("ExtensionView") != null ? getInitParameter("ExtensionView") : "jsp";
         this.CheminUpload = getInitParameter("CheminUpload") != null ? getInitParameter("CheminUpload") : "";
+        this.authSessionKey = getInitParameter("AuthSessionKey") != null ? getInitParameter("AuthSessionKey") : "userConnecte";
         try {
             ArrayList<ArrayList<String>> scanResultMap = Scannerrrs.ScannerURLMapping(chemine, packageContr);
            // Scannerrrs.ScannerObjetDansObjet(chemine, packageContr);
@@ -55,6 +57,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
         } catch (Exception e) {
             this.Errer = e.getMessage();
         }
+
         this.springContext = (WebApplicationContext) getServletContext().getAttribute("springContext");
     }
  
@@ -159,6 +162,22 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     //maka donnee by url
     protected void TakeDonneByUrl(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, Map<URLetMethodeHttps, ClasseMethodeMap> listeFiltree, Map<String, MapFile> mp){
         listeFiltree.forEach((url, classeMethode) -> {
+            if (classeMethode.isAuthCOnnect()){
+                jakarta.servlet.http.HttpSession httpSession = request.getSession(false); // false = ne pas en créer une nouvelle pour rien
+    
+                boolean estConnecte = false;
+                if (httpSession != null) {
+                    utils.MySession mySession = (utils.MySession) httpSession.getAttribute(this.authSessionKey);
+
+                    if (mySession != null) {
+                        estConnecte = true; 
+                    }
+                }
+
+                if (!estConnecte) {
+                    throw new Exception("Accès refusé : Vous devez être connecté pour accéder à cette ressource.");
+                }
+            }
             Map<String, String[]> parameterMap = request.getParameterMap();
             Map<String, String[]> parametresFiltrees = new HashMap<>();
             // class[0] ilay class attribut, class[1] ilay class an ilay objet
@@ -261,15 +280,18 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                             //////////////////////////////////////////GEMINI////////////////////////////////////////////////////
                             // --- GESTION DE MySession --- //
                             if (typeParametre == utils.MySession.class) {
-                                jakarta.servlet.http.HttpSession httpSession = request.getSession();
+                                jakarta.servlet.http.HttpSession httpSession = request.getSession(false);
                                 
                                 // 1. Vérifier si l'objet MySession existe déjà dans la HttpSession de Java
-                                utils.MySession mySession = (utils.MySession) httpSession.getAttribute("myCustomSession");
+                                utils.MySession mySession = (utils.MySession) httpSession.getAttribute(this.authSessionKey);
                                 
                                 if (mySession == null) {
                                     // S'il n'existe pas, on le crée avec l'ID de la session Java
-                                    mySession = new utils.MySession(httpSession.getId());
-                                    httpSession.setAttribute("myCustomSession", mySession);
+                                    mySession = (utils.MySession) httpSession.getAttribute("myCustomSession");
+                                    if (mySession == null) {
+                                        mySession = new utils.MySession(httpSession.getId());
+                                        httpSession.setAttribute("myCustomSession", mySession);
+                                    }
                                 }
                                 
                                 // 2. Stockage global dans le ServletContext (Map globale id -> MySession)
@@ -375,7 +397,8 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                 } catch (Exception e) {
                     request.setAttribute("erreurExecution", e.getMessage());
                 }
-        });
+        
+    });
     }
 
     
