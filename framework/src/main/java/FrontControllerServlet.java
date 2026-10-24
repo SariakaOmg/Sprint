@@ -58,64 +58,6 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
         this.springContext = (WebApplicationContext) getServletContext().getAttribute("springContext");
     }
  
-    // public static void GenererFonctionGetters(Class<?> kilasySup, String NomMethode, Class<?> typeDeRetour){
-
-    // }
-    // public static void GenererFonctionSetters(Class<?> kilasySup, String NomMethode, Class<?> TypeArg){
-
-    // }
-    //
-    // private Object convertirArgument(String[] valeurs, Class<?> typeAttendu) {
-    // if (valeurs == null || valeurs.length == 0) {
-    //     if (typeAttendu.isPrimitive()) {
-    //         if (typeAttendu == boolean.class) return false;
-    //         return 0; 
-    //     }
-    //     return null; 
-    // }
- 
-    // String premiereValeur = valeurs[0]; 
-
-    // if(valeurs.length == 1){
-    // if (typeAttendu == String.class) {
-    //     return premiereValeur;
-    // } else if (typeAttendu == int.class || typeAttendu == Integer.class) {
-    //     return Integer.parseInt(premiereValeur);
-    // } else if (typeAttendu == double.class || typeAttendu == Double.class) {
-    //     return Double.parseDouble(premiereValeur);
-    // } else if (typeAttendu == boolean.class || typeAttendu == Boolean.class) {
-    //     return Boolean.parseBoolean(premiereValeur);
-    // }
-    // return premiereValeur; 
-    // }else if(valeurs.length > 1){
-    //     if (typeAttendu == String[].class) {
-    //         return valeurs;
-    //     } else if (typeAttendu == int[].class) {
-    //         int[] intArray = new int[valeurs.length];
-    //         for (int i = 0; i < valeurs.length; i++) {
-    //             intArray[i] = Integer.parseInt(valeurs[i]);
-    //         }
-    //         return intArray;
-    //     } else if (typeAttendu == double[].class) {
-    //         double[] doubleArray = new double[valeurs.length];
-    //         for (int i = 0; i < valeurs.length; i++) {
-    //             doubleArray[i] = Double.parseDouble(valeurs[i]);
-    //         }
-    //         return doubleArray;
-    //     } else if (typeAttendu == boolean[].class) {
-    //         boolean[] booleanArray = new boolean[valeurs.length];
-    //         for (int i = 0; i < valeurs.length; i++) {
-    //             booleanArray[i] = Boolean.parseBoolean(valeurs[i]);
-    //         }
-    //         return booleanArray;
-    //     }
-    // }
-
-    
-    
-    // return null;
-    // }
-
     private Object convertirArgument(String[] valeurs, Class<?> typeAttendu) {
     if (valeurs == null || valeurs.length == 0) {
         if (typeAttendu.isPrimitive()) return typeAttendu == boolean.class ? (Object) false : (Object) 0;
@@ -255,37 +197,19 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                         Parameter[] p = m.getParameters();
                         Map<Integer, Object> finalE = new HashMap<>();
                         Set<Integer> positionsFichiers = new HashSet<>();
+                        utils.MaSession sessionInvoquee = null;
                         for (int index = 0; index < p.length; index++) {
                             String nomParametre = p[index].getName();
                             Class<?> typeParametre = p[index].getType();
                             //////////////////////////////////////////GEMINI////////////////////////////////////////////////////
                             // --- GESTION DE MySession --- //
-                            if (typeParametre == utils.MySession.class) {
-                                jakarta.servlet.http.HttpSession httpSession = request.getSession();
-                                
-                                // 1. Vérifier si l'objet MySession existe déjà dans la HttpSession de Java
-                                utils.MySession mySession = (utils.MySession) httpSession.getAttribute("myCustomSession");
-                                
-                                if (mySession == null) {
-                                    // S'il n'existe pas, on le crée avec l'ID de la session Java
-                                    mySession = new utils.MySession(httpSession.getId());
-                                    httpSession.setAttribute("myCustomSession", mySession);
-                                }
-                                
-                                // 2. Stockage global dans le ServletContext (Map globale id -> MySession)
-                                jakarta.servlet.ServletContext context = getServletContext();
-                                Map<String, utils.MySession> globalSessionsMap = (Map<String, utils.MySession>) context.getAttribute("globalSessionsMap");
-                                
-                                if (globalSessionsMap == null) {
-                                    globalSessionsMap = new HashMap<>();
-                                    context.setAttribute("globalSessionsMap", globalSessionsMap);
-                                }
-                                // On associe l'ID de session au MySession
-                                globalSessionsMap.put(httpSession.getId(), mySession);
-                            
-                                // 3. On l'ajoute aux arguments injectés pour la méthode du contrôleur
-                                finalE.put(index, mySession);
-                            }
+                            if (typeParametre == utils.MaSession.class) {
+                                    // 1. Créer ou récupérer la MaSession via la méthode statique from(...)
+                                    jakarta.servlet.http.HttpSession httpSession = request.getSession(true);
+                                    sessionInvoquee = utils.MaSession.from(httpSession);
+
+                                    finalE.put(index, sessionInvoquee);
+                            }   
                             ///////////////////////////////////////////////////////////////////////////////////////////////////////
                             else if (typeParametre == MapFile.class){
                                 finalE.put(index, mp.get(nomParametre));
@@ -343,6 +267,13 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                         }
                         
                         result = m.invoke(instance, args);
+
+                        if (sessionInvoquee != null) {
+                            jakarta.servlet.http.HttpSession httpSession = request.getSession(false);
+                            if (httpSession != null) {
+                                sessionInvoquee.flushTo(httpSession);
+                            }
+                        }
                     }
                 
                     request.setAttribute("methodeNom", m.getName());
