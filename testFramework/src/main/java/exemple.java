@@ -3,9 +3,9 @@ import mg.itu.Param;
 import mg.itu.URLMapping;
 import mg.itu.WebRest;
 import utils.ModelView;
+import utils.MaSession;
 import utils.MapFile;
 import mg.itu.Param;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,9 +17,24 @@ import exemple.model.MonObjet;
 import exemple.model.MonObjet2;
 import exemple.model.MonObjet3;
 @Controller
+
 public class exemple {
 
+    @URLMapping(value="/traitement-login", methode = "GET")
+    public void login(MaSession session) {
+        // Supposons que l'utilisateur s'est connecté avec succès
+        String nomUtilisateur = "Sooe";
 
+        // === POUR METTRE UNE VALEUR DANS LA SESSION ===
+        session.setAttribute("userConnecte", nomUtilisateur);
+        session.setAttribute("role", "Admin");
+    }
+
+    @URLMapping(value = "/profil", methode = "GET")
+    public String monProfil(MaSession session) {
+        // Plus besoin de request.getSession() !
+        return "session :"+session.getAttribute("userConnecte")+"";
+    }
 
     @URLMapping(value = "/showForm", methode = "GET")
     public ModelView showForm() {
