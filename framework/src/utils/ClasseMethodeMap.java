@@ -3,6 +3,7 @@ package utils;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.lang.reflect.Field;
@@ -15,8 +16,15 @@ public class ClasseMethodeMap {
     boolean Staticite;
     boolean WebRest;
     boolean AuthCOnnect;
+    ArrayList<String> Role;
 
 
+    public ArrayList<String> getRole() {
+        return Role;
+    }
+    public void setRole(ArrayList<String> role) {
+        Role = role;
+    }
     public Class<?> getKilasy() {
         return kilasy;
     }

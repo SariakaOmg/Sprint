@@ -1,6 +1,7 @@
 package utils;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -88,9 +89,12 @@ public class Scannerrrs {
                     }
 
                     if (method[i].isAnnotationPresent(mg.itu.AuthentifiedMethod.class)) {
+                        AuthentifiedMethod auth = method[i].getAnnotation(mg.itu.AuthentifiedMethod.class);
                         listePresentMapping1.add("true");
+                        listePresentMapping1.add(auth.role());
                     } else {
                         listePresentMapping1.add("false");
+                        listePresentMapping1.add("");
                     }   
 
                     listePresentMapping.add(listePresentMapping1);
@@ -109,6 +113,17 @@ public class Scannerrrs {
                cm.setNomMethode(listePresentMapping.get(index).get(1));
                cm.setWebRest(Boolean.parseBoolean(listePresentMapping.get(index).get(4)));
                cm.setAuthCOnnect(Boolean.parseBoolean(listePresentMapping.get(index).get(5)));
+            //    //prendre le role separee par &
+            //     ArrayList<String> role = new ArrayList<>(Arrays.asList(listePresentMapping.get(index).get(6).split("&")));
+            //    //
+            //     // m.setRole(listePresentMapping.get(index).get(6));
+            //    cm.setRole(role);
+                String roleStr = listePresentMapping.get(index).get(6);
+                ArrayList<String> role = new ArrayList<>();
+                if (roleStr != null && !roleStr.isEmpty()) {
+                    role = new ArrayList<>(Arrays.asList(roleStr.split("&")));
+                }
+                cm.setRole(role);
                cm.CompletMethods();
                URLetMethodeHttps urLetMethodeHttps = new URLetMethodeHttps();
                urLetMethodeHttps.setMethode(listePresentMapping.get(index).get(3));

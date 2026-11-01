@@ -1,3 +1,4 @@
+import mg.itu.AuthentifiedMethod;
 import mg.itu.Controller;
 import mg.itu.Param;
 import mg.itu.URLMapping;
@@ -20,20 +21,27 @@ import exemple.model.MonObjet3;
 
 public class exemple {
 
+    @URLMapping(value="/logout", methode = "GET")
+    public void logout(MySession session){
+        session.removeAttribute("userConnecte");
+        session.removeAttribute("role");
+    }
+
     @URLMapping(value="/traitement-login", methode = "GET")
     public void login(MySession session) {
         // Supposons que l'utilisateur s'est connecté avec succès
         String nomUtilisateur = "Sariaka";
 
         // === POUR METTRE UNE VALEUR DANS LA SESSION ===
-        session.set("userConnecte", nomUtilisateur);
-        session.set("role", "Admin");
+        session.setAttribute("userConnecte", nomUtilisateur);
+        session.setAttribute("role", "Admin");
     }
 
+    @AuthentifiedMethod(role = "Admin")
     @URLMapping(value = "/profil", methode = "GET")
     public String monProfil(MySession session) {
         // Plus besoin de request.getSession() !
-        return "session :"+session.get("userConnecte")+"";
+        return "session :"+session.getAttribute("userConnecte")+"";
     }
 
     @URLMapping(value = "/showForm", methode = "GET")

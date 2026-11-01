@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.io.InputStream;
 import utils.*;
+import mg.itu.AuthentifiedMethod;
 import mg.itu.Param;
 
 import org.springframework.web.context.WebApplicationContext;
@@ -32,6 +33,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     private String extensionView;
     private String CheminUpload;
     private String authSessionKey;
+    private String role;
  
     public void init() throws ServletException {
         // Étape A : Récupérer la valeur déclarée dans le web.xml ("/WEB-INF/classes/")
@@ -49,6 +51,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
         this.extensionView = getInitParameter("ExtensionView") != null ? getInitParameter("ExtensionView") : "jsp";
         this.CheminUpload = getInitParameter("CheminUpload") != null ? getInitParameter("CheminUpload") : "";
         this.authSessionKey = getInitParameter("AuthSessionKey") != null ? getInitParameter("AuthSessionKey") : "userConnecte";
+        this.role = getInitParameter("RoleSession") != null ? getInitParameter("RoleSession") : "";
         try {
             ArrayList<ArrayList<String>> scanResultMap = Scannerrrs.ScannerURLMapping(chemine, packageContr);
            // Scannerrrs.ScannerObjetDansObjet(chemine, packageContr);
@@ -160,22 +163,45 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     return null;
 }
     //maka donnee by url
-    protected void TakeDonneByUrl(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, Map<URLetMethodeHttps, ClasseMethodeMap> listeFiltree, Map<String, MapFile> mp){
+    protected void TakeDonneByUrl(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, Map<URLetMethodeHttps, ClasseMethodeMap> listeFiltree, Map<String, MapFile> mp) throws Exception{
         listeFiltree.forEach((url, classeMethode) -> {
-            if (classeMethode.isAuthCOnnect()){
-                jakarta.servlet.http.HttpSession httpSession = request.getSession(false); // false = ne pas en créer une nouvelle pour rien
+            if (classeMethode.isAuthCOnnect() && classeMethode.getRole().isEmpty()){
+                jakarta.servlet.http.HttpSession httpSession = request.getSession(true); // false = ne pas en créer une nouvelle pour rien
     
                 boolean estConnecte = false;
                 if (httpSession != null) {
-                    utils.MySession mySession = (utils.MySession) httpSession.getAttribute(this.authSessionKey);
+                    // utils.MySession mySession = (utils.MySession) httpSession.getAttribute(this.authSessionKey);
+                    utils.MySession mySession = utils.MySession.from(httpSession);
 
-                    if (mySession != null) {
+                    Object user = mySession.getAttribute(this.authSessionKey);
+                    if (user != null) {
                         estConnecte = true; 
                     }
                 }
 
                 if (!estConnecte) {
-                    throw new Exception("Accès refusé : Vous devez être connecté pour accéder à cette ressource.");
+                    throw new RuntimeException("Accès refusé : Vous devez être connecté pour accéder à cette ressource.");
+                    // throw new Exception("Accès refusé : Vous devez être connecté pour accéder à cette ressource.");
+                }
+            }else if (classeMethode.isAuthCOnnect() && !classeMethode.getRole().isEmpty()){
+                jakarta.servlet.http.HttpSession httpSession = request.getSession(false); // false = ne pas en créer une nouvelle pour rien
+                boolean estConnecte = false;
+                String role = "";
+                if (httpSession != null) {
+                    utils.MySession mySession = utils.MySession.from(httpSession);
+
+                    // utils.MySession mySession = (utils.MySession) httpSession.getAttribute(this.authSessionKey);
+                    Object user = mySession.getAttribute(this.authSessionKey);
+                    
+                    if (user != null) {
+                        estConnecte = true; 
+                        role = String.valueOf(mySession.getAttribute(this.role));
+                    }
+                }
+
+                if (!estConnecte || !(classeMethode.getRole().contains(role))) {
+                    throw new RuntimeException("Accès refusé : Vous devez être connecté pour accéder à cette ressource. Soit le role requis n est pas valide");
+                    // throw new Exception("Accès refusé : Vous devez être connecté pour accéder à cette ressource. Soit le role requis n est pas valide");
                 }
             }
             Map<String, String[]> parameterMap = request.getParameterMap();
@@ -274,39 +300,47 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                         Parameter[] p = m.getParameters();
                         Map<Integer, Object> finalE = new HashMap<>();
                         Set<Integer> positionsFichiers = new HashSet<>();
+                        utils.MySession sessionInvoquee = null;
                         for (int index = 0; index < p.length; index++) {
                             String nomParametre = p[index].getName();
                             Class<?> typeParametre = p[index].getType();
                             //////////////////////////////////////////GEMINI////////////////////////////////////////////////////
                             // --- GESTION DE MySession --- //
-                            if (typeParametre == utils.MySession.class) {
-                                jakarta.servlet.http.HttpSession httpSession = request.getSession(false);
+                            // if (typeParametre == utils.MySession.class) {
+                            //     jakarta.servlet.http.HttpSession httpSession = request.getSession(false);
                                 
-                                // 1. Vérifier si l'objet MySession existe déjà dans la HttpSession de Java
-                                utils.MySession mySession = (utils.MySession) httpSession.getAttribute(this.authSessionKey);
+                            //     // 1. Vérifier si l'objet MySession existe déjà dans la HttpSession de Java
+                            //     utils.MySession mySession = (utils.MySession) httpSession.getAttribute(this.authSessionKey);
                                 
-                                if (mySession == null) {
-                                    // S'il n'existe pas, on le crée avec l'ID de la session Java
-                                    mySession = (utils.MySession) httpSession.getAttribute("myCustomSession");
-                                    if (mySession == null) {
-                                        mySession = new utils.MySession(httpSession.getId());
-                                        httpSession.setAttribute("myCustomSession", mySession);
-                                    }
-                                }
+                            //     if (mySession == null) {
+                            //         // S'il n'existe pas, on le crée avec l'ID de la session Java
+                            //         mySession = (utils.MySession) httpSession.getAttribute("myCustomSession");
+                            //         if (mySession == null) {
+                            //             mySession = new utils.MySession(httpSession.getId());
+                            //             httpSession.setAttribute("myCustomSession", mySession);
+                            //         }
+                            //     }
                                 
-                                // 2. Stockage global dans le ServletContext (Map globale id -> MySession)
-                                jakarta.servlet.ServletContext context = getServletContext();
-                                Map<String, utils.MySession> globalSessionsMap = (Map<String, utils.MySession>) context.getAttribute("globalSessionsMap");
+                            //     // 2. Stockage global dans le ServletContext (Map globale id -> MySession)
+                            //     jakarta.servlet.ServletContext context = getServletContext();
+                            //     Map<String, utils.MySession> globalSessionsMap = (Map<String, utils.MySession>) context.getAttribute("globalSessionsMap");
                                 
-                                if (globalSessionsMap == null) {
-                                    globalSessionsMap = new HashMap<>();
-                                    context.setAttribute("globalSessionsMap", globalSessionsMap);
-                                }
-                                // On associe l'ID de session au MySession
-                                globalSessionsMap.put(httpSession.getId(), mySession);
+                            //     if (globalSessionsMap == null) {
+                            //         globalSessionsMap = new HashMap<>();
+                            //         context.setAttribute("globalSessionsMap", globalSessionsMap);
+                            //     }
+                            //     // On associe l'ID de session au MySession
+                            //     globalSessionsMap.put(httpSession.getId(), mySession);
                             
-                                // 3. On l'ajoute aux arguments injectés pour la méthode du contrôleur
-                                finalE.put(index, mySession);
+                            //     // 3. On l'ajoute aux arguments injectés pour la méthode du contrôleur
+                            //     finalE.put(index, mySession);
+                            // }
+                            if (typeParametre == utils.MySession.class) {
+                                // 1. Créer ou récupérer la MaSession via la méthode statique from(...)
+                                jakarta.servlet.http.HttpSession httpSession = request.getSession(true);
+                                sessionInvoquee = utils.MySession.from(httpSession);
+
+                                finalE.put(index, sessionInvoquee);
                             }
                             ///////////////////////////////////////////////////////////////////////////////////////////////////////
                             else if (typeParametre == MapFile.class){
@@ -365,6 +399,13 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                         }
                         
                         result = m.invoke(instance, args);
+
+                        if (sessionInvoquee != null) {
+                            jakarta.servlet.http.HttpSession httpSession = request.getSession(false);
+                            if (httpSession != null) {
+                                sessionInvoquee.flushTo(httpSession);
+                            }
+                        }
                     }
                 
                     request.setAttribute("methodeNom", m.getName());
@@ -501,7 +542,12 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
             return;
         }
         if (!listeFiltree.isEmpty()) {
-            this.TakeDonneByUrl(request, response, listeFiltree, fichiersUploades);
+            try {
+                this.TakeDonneByUrl(request, response, listeFiltree, fichiersUploades);
+            }catch(Exception e){
+                this.Output(request, response);
+                return;
+            }
         }
         String vueForward = (String) request.getAttribute("vueForward");
         if (vueForward != null) {
