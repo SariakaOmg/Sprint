@@ -1,0 +1,21 @@
+Micreer Annotation type methode : 
+    - mila parametre
+    ex : @URLMapping("/emplist")
+    
+    URLMapping
+
+Tadiavina le method ny controller iray de jerena oe misy annotation 
+le but : 
+  - ny "/emp/list" ao amin ny classe EmptController amin ny methode liste : 
+
+URL de navigation si connais pas throws Exeption et il liste tous ce qu il connais ,  si il connais donc il devinne si l url est de classe ... et de methode : 
+
+- fonction alaina daholo ilay lien annotation sy izay mobamoba azy:
+
+sprint6 :
+Obj : tsy mande any am vue le url associe amle methode fa mamerina json
+cote framework : 
+- manampy annotation
+
+erreur : si l un  de mes controller n a pas de @Url Mapping alors elle exception 
+
