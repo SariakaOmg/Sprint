@@ -171,7 +171,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                 boolean estConnecte = false;
                 if (httpSession != null) {
                     // utils.MySession mySession = (utils.MySession) httpSession.getAttribute(this.authSessionKey);
-                    utils.MySession mySession = utils.MySession.from(httpSession);
+                    utils.MaSession mySession = utils.MaSession.from(httpSession);
 
                     Object user = mySession.getAttribute(this.authSessionKey);
                     if (user != null) {
@@ -188,7 +188,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                 boolean estConnecte = false;
                 String role = "";
                 if (httpSession != null) {
-                    utils.MySession mySession = utils.MySession.from(httpSession);
+                    utils.MaSession mySession = utils.MaSession.from(httpSession);
 
                     // utils.MySession mySession = (utils.MySession) httpSession.getAttribute(this.authSessionKey);
                     Object user = mySession.getAttribute(this.authSessionKey);
@@ -300,23 +300,23 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                         Parameter[] p = m.getParameters();
                         Map<Integer, Object> finalE = new HashMap<>();
                         Set<Integer> positionsFichiers = new HashSet<>();
-                        utils.MySession sessionInvoquee = null;
+                        utils.MaSession sessionInvoquee = null;
                         for (int index = 0; index < p.length; index++) {
                             String nomParametre = p[index].getName();
                             Class<?> typeParametre = p[index].getType();
                             //////////////////////////////////////////GEMINI////////////////////////////////////////////////////
                             // --- GESTION DE MySession --- //
-                            // if (typeParametre == utils.MySession.class) {
+                            // if (typeParametre == utils.MaSession.class) {
                             //     jakarta.servlet.http.HttpSession httpSession = request.getSession(false);
                                 
-                            //     // 1. Vérifier si l'objet MySession existe déjà dans la HttpSession de Java
-                            //     utils.MySession mySession = (utils.MySession) httpSession.getAttribute(this.authSessionKey);
+                            //     // 1. Vérifier si l'objet MaSession existe déjà dans la HttpSession de Java
+                            //     utils.MaSession mySession = (utils.MaSession) httpSession.getAttribute(this.authSessionKey);
                                 
                             //     if (mySession == null) {
                             //         // S'il n'existe pas, on le crée avec l'ID de la session Java
-                            //         mySession = (utils.MySession) httpSession.getAttribute("myCustomSession");
+                            //         mySession = (utils.MaSession) httpSession.getAttribute("myCustomSession");
                             //         if (mySession == null) {
-                            //             mySession = new utils.MySession(httpSession.getId());
+                            //             mySession = new utils.MaSession(httpSession.getId());
                             //             httpSession.setAttribute("myCustomSession", mySession);
                             //         }
                             //     }
@@ -335,10 +335,10 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                             //     // 3. On l'ajoute aux arguments injectés pour la méthode du contrôleur
                             //     finalE.put(index, mySession);
                             // }
-                            if (typeParametre == utils.MySession.class) {
+                            if (typeParametre == utils.MaSession.class) {
                                 // 1. Créer ou récupérer la MaSession via la méthode statique from(...)
                                 jakarta.servlet.http.HttpSession httpSession = request.getSession(true);
-                                sessionInvoquee = utils.MySession.from(httpSession);
+                                sessionInvoquee = utils.MaSession.from(httpSession);
 
                                 finalE.put(index, sessionInvoquee);
                             }

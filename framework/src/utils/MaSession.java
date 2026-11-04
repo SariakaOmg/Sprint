@@ -6,20 +6,20 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class MySession {
+public class MaSession {
     private String id;
     private Map<String, Object> attributes = new HashMap<>();
     private Set<String> initialKeys = new HashSet<>();
 
-    public MySession() {}
+    public MaSession() {}
 
-    public MySession(String id) {
+    public MaSession(String id) {
         this.id = id;
     }
 
     // --- Fonction statique from(HttpSession) ---
-    public static MySession from(HttpSession httpSession) {
-        MySession session = new MySession(httpSession.getId());
+    public static MaSession from(HttpSession httpSession) {
+        MaSession session = new MaSession(httpSession.getId());
         
         httpSession.getAttributeNames().asIterator().forEachRemaining(name -> {
             Object value = httpSession.getAttribute(name);
