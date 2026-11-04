@@ -167,7 +167,7 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
     
                 boolean estConnecte = false;
                 if (httpSession != null) {
-                    utils.MySession mySession = (utils.MySession) httpSession.getAttribute(this.authSessionKey);
+                    utils.MaSession mySession = (utils.MaSession) httpSession.getAttribute(this.authSessionKey);
 
                     if (mySession != null) {
                         estConnecte = true; 
@@ -279,24 +279,24 @@ public class FrontControllerServlet extends jakarta.servlet.http.HttpServlet {
                             Class<?> typeParametre = p[index].getType();
                             //////////////////////////////////////////GEMINI////////////////////////////////////////////////////
                             // --- GESTION DE MySession --- //
-                            if (typeParametre == utils.MySession.class) {
+                            if (typeParametre == utils.MaSession.class) {
                                 jakarta.servlet.http.HttpSession httpSession = request.getSession(false);
                                 
                                 // 1. Vérifier si l'objet MySession existe déjà dans la HttpSession de Java
-                                utils.MySession mySession = (utils.MySession) httpSession.getAttribute(this.authSessionKey);
+                                utils.MaSession mySession = (utils.MaSession) httpSession.getAttribute(this.authSessionKey);
                                 
                                 if (mySession == null) {
                                     // S'il n'existe pas, on le crée avec l'ID de la session Java
-                                    mySession = (utils.MySession) httpSession.getAttribute("myCustomSession");
+                                    mySession = (utils.MaSession) httpSession.getAttribute("myCustomSession");
                                     if (mySession == null) {
-                                        mySession = new utils.MySession(httpSession.getId());
+                                        mySession = new utils.MaSession(httpSession.getId());
                                         httpSession.setAttribute("myCustomSession", mySession);
                                     }
                                 }
                                 
                                 // 2. Stockage global dans le ServletContext (Map globale id -> MySession)
                                 jakarta.servlet.ServletContext context = getServletContext();
-                                Map<String, utils.MySession> globalSessionsMap = (Map<String, utils.MySession>) context.getAttribute("globalSessionsMap");
+                                Map<String, utils.MaSession> globalSessionsMap = (Map<String, utils.MaSession>) context.getAttribute("globalSessionsMap");
                                 
                                 if (globalSessionsMap == null) {
                                     globalSessionsMap = new HashMap<>();
