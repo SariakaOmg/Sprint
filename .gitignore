@@ -1,0 +1,5 @@
+framework/bin/
+testFramework/build/
+*.class
+*.war
+*.jar

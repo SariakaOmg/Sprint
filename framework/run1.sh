@@ -1,16 +1,21 @@
 # Force l'utilisation de Java 21 ou supérieur pour Tomcat 10
 export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 # (Ou le chemin vers ton JDK plus récent si tu l'as installé manuellement dans /opt/)
-
+# Supprimer dans le bin
+rm -rf bin/*
+if [ -f "essai.jar" ]; then
+rm essai.jar
+fi
 # 1. Crée un dossier temporaire pour stocker les fichiers compilés (.class)
 mkdir -p bin
 
 # 2. Compile ton code
-javac -cp "lib/servlet-api.jar" -d bin src/main/java/FrontControllerServlet.java
+javac -cp "lib/gson-2.10.1.jar:lib/servlet-api.jar:lib/spring-context-6.1.14.jar:lib/spring-web-6.1.14.jar:lib/spring-beans-6.1.14.jar:lib/spring-core-6.1.14.jar:lib/spring-expression-6.1.14.jar:lib/spring-jdbc-6.1.14.jar:lib/spring-jcl-6.1.14.jar" -d bin src/utils/ModelView.java src/utils/MapFile.java src/utils/Util.java src/utils/RegistreAccesseurs.java src/utils/Accesseur.java src/utils/URLetMethodeHttps.java src/utils/ClasseMethodeMap.java src/mg/itu/URLMapping.java src/mg/itu/Param.java src/mg/itu/WebRest.java src/utils/Scannerrrs.java src/mg/itu/Controller.java src/main/java/FrontControllerServlet.java src/mg/itu/Singleton.java src/mg/itu/ObjetDansObjet.java src/main/java/FrontControllerListener.java src/utils/ObjetC.java src/utils/MySession.java mg/itu/AuthentifiedMethod.java
 
 # 3. Crée le fichier JAR
 jar -cvf essai.jar -C bin .
 
+cp -f essai.jar ../testFramework/lib/
 # --- AVANT de lancer Tomcat, n'oublie pas de copier ton dossier projet-test dans webapps ! ---
 # cp -r /chemin/vers/projet-test /home/asus/Documents/apache-tomcat-10.1.28/webapps/
 
